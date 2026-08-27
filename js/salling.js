@@ -372,7 +372,7 @@ class Salling extends Brand {
         if (this.settings.loyaltyCode != null) {
             postRenderCallbacks.push(() => {
                 try {
-                    JsBarcode(`#${this.id()}-svg`, this.settings.loyaltyCode, {
+                    JsBarcode(document.getElementById(`${this.id()}-svg`), this.settings.loyaltyCode, {
                         format: "ean13",
                         flat: true,
                     });
