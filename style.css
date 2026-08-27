@@ -1,0 +1,268 @@
+:root {
+    overscroll-behavior: none;
+    color: var(--font);
+
+    /* color scheme dependant */
+    --background: #f0f4f9;
+    --card: #ffffff;
+    --font: #191919;
+    --font-strong: #000000;
+    --font-weak: #666666;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #1e1f20;
+        --card: #0e0e0e;
+        --font: #cccccc;
+        --font-strong: #ffffff;
+        --font-weak: #999999;
+    }
+}
+
+body {
+    position: absolute;
+    display: grid;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    background-color: var(--background);
+    grid-template-rows: 1fr min-content;
+}
+
+#frame {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+#brandSelector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+}
+
+#zoom {
+    display: none;
+    position: absolute;
+    width: calc(100vw - 2rem);
+    height: calc(100vh - 2rem);
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.66);
+    object-fit: contain;
+}
+
+#brandSettings {
+    display: none;
+    position: absolute;
+    width: calc(100vw - 2rem);
+    height: calc(100vh - 2rem);
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.settingsButton {
+    width: 2.5rem;
+    height: 2.5rem;
+    cursor: pointer;
+    float: right;
+    margin-left: -2.5rem;
+}
+
+.brandButton {
+    text-align: center;
+    font-size: 2rem;
+    flex-grow: 1;
+    padding: 0.5rem;
+    background-color: var(--card);
+}
+
+.brand {
+    overscroll-behavior: none;
+    display: none;
+    width: calc(100% - 1rem);
+    height: calc(100% - 1rem);
+    overflow: scroll;
+    scrollbar-width: none;
+    border: 0.5rem solid var(--font-strong);
+}
+
+.brandLoyalty {
+    text-align: center;
+}
+
+.brandTitle {
+    text-align: center;
+    font-size: 2rem;
+    padding-bottom: 0.5rem;
+}
+
+.brandList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cat {
+    display: inline-block;
+    width: calc(100% - 1rem);
+    padding: 0.5rem;
+    background-color: var(--card);
+}
+
+.catTitle {
+    font-size: 2rem;
+}
+
+.catList {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    gap: 0.5rem;
+    transition: max-height 0.5s;
+}
+
+.catArrow {
+    display: inline-block;
+    border: 0 solid var(--font-strong);
+    border-bottom-width: 0.5rem;
+    border-right-width: 0.5rem;
+    margin: 0.5rem 1rem 0 0.5rem;
+    transform: rotate(45deg);
+    transition: transform 0.5s;
+    width: 1rem;
+    height: 1rem;
+}
+
+.prod {
+    border-radius: 1rem;
+    min-width: min(max(10rem, calc(50vw - 2rem)), 20rem);
+    flex-basis: min(max(10rem, calc(50vw - 2rem)), 20rem);
+    max-width: min(max(20rem, 100vw), 25rem);
+    flex-grow: 1;
+    flex-shrink: 0;
+    overflow: hidden;
+    background-color: var(--background);
+}
+
+.prodImage {
+    aspect-ratio: 1;
+    border-radius: 0 0 1rem 1rem;
+    overflow: hidden;
+}
+
+.prodText {
+    padding: 0.5rem;
+}
+
+.prodName {
+    text-align: center;
+    margin: 0;
+}
+
+.prodOldPrice {
+    text-decoration: line-through;
+}
+
+.prodImageImage {
+    margin: auto;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    overflow: hidden;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.prodText>p {
+    margin: 0;
+}
+
+
+.sallingBarcode {
+    width: min(100%, 25rem);
+    height: auto;
+}
+
+.sallingSettingsContainer {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    max-width: 28.125rem;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.sallingSettingsTitle {
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.settingRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.settingRow label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.settingRow input[type="text"],
+.settingRow input[type="number"] {
+    padding: 0.5rem 0.625rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.settingRow input[type="text"]:focus,
+.settingRow input[type="number"]:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+.settingRow.checkboxRow {
+    flex-direction: row;
+    align-items: center;
+}
+
+.settingLabelCheckbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.settingLabelCheckbox input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+}
+
+.settingActions {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.settingsApplyBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    border: none;
+    transition: opacity 0.2s ease;
+}
+
+.settingsApplyBtn:hover {
+    opacity: 0.85;
+}

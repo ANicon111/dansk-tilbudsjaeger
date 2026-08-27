@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f9f9f9">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">
+
+    <link rel="manifest" href="en/manifest.json" />
+    <link rel="icon" href="icon.png">
+    <title>Dansk Tilbudsjæger</title>
+    <style>
+        body {
+            animation: show 0s 3s forwards;
+            visibility: hidden;
+        }
+
+        @keyframes show {
+            to {
+                visibility: visible;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Redirecting...</h2>
+    <p><a href="en/index.html">English</a></p>
+    <p><a href="da/index.html">dansk</a></p>
+    <p><a href="ro/index.html">română</a></p>
+    <p><a href="de/index.html">deutch</a></p>
+    <p><a href="de/index.html">français</a></p>
+    <script>
+        params = new URL(window.location.href).searchParams.toString();
+        const userLang = localStorage.getItem("preferred-language") || navigator.language || navigator.userLanguage;
+        let redirectLang = "en";
+        switch (userLang) {
+            case "da":
+                redirectLang = "da";
+                break;
+        }
+        redirectLang = "en"; //TODO remove
+        window.location.href = `${redirectLang}/index.html?${params}`;
+    </script>
+</body>
