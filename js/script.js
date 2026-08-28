@@ -267,13 +267,12 @@ function unitToSI(unit) {
 
 /**
  * 
- * @param {Brand} brand 
  * @param {string} url 
  * @param {*} headers 
  * @param {string | null} errorMessage 
  * @returns {* | null}
  */
-async function genericGet(brand, url, headers, errorMessage) {
+async function genericGet(url, headers, errorMessage) {
     try {
         const response = await fetch(url, {
             method: "GET",

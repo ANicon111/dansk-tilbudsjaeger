@@ -1,13 +1,11 @@
 /**
  * 
- * @param {Salling} sallingBrand 
  * @param {string} url 
  * @param {string | null} errorMessage 
  * @returns {* | null}
  */
-function sallingGet(sallingBrand, url, errorMessage) {
+function sallingGet(url, errorMessage) {
     return genericGet(
-        sallingBrand,
         url,
         {
             "Accept-Encoding": "text/json",
@@ -17,15 +15,13 @@ function sallingGet(sallingBrand, url, errorMessage) {
 }
 
 /**
- * 
- * @param {Salling} sallingBrand 
+ * @param {Salling} sallingBrand
  * @param {string} url 
  * @param {string | null} errorMessage 
  * @returns {* | null}
  */
 function sallingTenantGet(sallingBrand, url, errorMessage) {
     return genericGet(
-        sallingBrand,
         url,
         {
             "Accept-Encoding": "text/json",
@@ -37,10 +33,10 @@ function sallingTenantGet(sallingBrand, url, errorMessage) {
 
 /**
  * Parses a Salling date string: "09.37, 25. april 2026"
- * @param {string} dateStr 
+ * @param {string} dateString 
  * @returns {Date|null}
  */
-function parseSallingDate(dateStr) {
+function parseSallingDate(dateString) {
     // 1. Define Danish month mapping (lowercase for safety)
     const months = {
         'januar': 0, 'februar': 1, 'marts': 2, 'april': 3, 'maj': 4, 'juni': 5,
@@ -50,7 +46,7 @@ function parseSallingDate(dateStr) {
     try {
         // 2. Clean and split the string using Regex
         // Matches digits and words, ignoring the comma and periods
-        const parts = dateStr.toLowerCase().match(/(\d+)\.(\d+),\s+(\d+)\.\s+(\w+)\s+(\d+)/);
+        const parts = dateString.toLowerCase().match(/(\d+)\.(\d+),\s+(\d+)\.\s+(\w+)\s+(\d+)/);
 
         if (!parts) return null;
 
@@ -86,7 +82,6 @@ class Salling extends Brand {
         this.tenantAlias = tenantAlias;
         this.accentColor = accentColor;
         this.settings.leafletBlacklist = leafletBlacklist;
-        this.settings.ignoreThreshold = 200;
         this.settings.enabledStoreList = [];
         this.settings.dataSaver = false;
         this.stored.stores = [];
@@ -99,10 +94,142 @@ class Salling extends Brand {
         const localPromise = this.fetchLocal();
         await Promise.allSettled([leafletPromise, localPromise]);
     }
+
+    async fetchLeaflet() {
+        try {
+            const leafletsOrder = await sallingTenantGet(this, 'https://p-club.dsgapps.dk/api/cp/leafletsOrder', lang.errors.failedLeaflet(this.name));
+            for (let j = 0; j < leafletsOrder.leafletIds.length; j++) {
+                const leaflet = leafletsOrder.leafletIds[j];
+
+                const leafletInfo = await sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, lang.errors.failedLeaflet(this.name));
+
+
+                if (this.settings.leafletBlacklist.some(e => leafletInfo?.label?.includes(e))) continue;
+
+                const leafletPages = await sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, lang.errors.failedLeaflet(this.name));
+
+                const promotions = await sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, lang.errors.failedLeaflet(this.name));
+
+                for (const promotion of promotions) {
+                    const points = Object.values(promotion.locations)[0];
+                    const width = leafletInfo?.dimensions?.width ?? 1;
+                    const height = leafletInfo?.dimensions?.height ?? Math.SQRT2;
+                    let top = points[0][1];
+                    let right = width - points[2][0];
+                    let bottom = height - points[2][1];
+                    let left = points[0][0];
+
+                    const runFrom = new Date(promotion.offer.run_from);
+                    runFrom.setHours(runFrom.getHours() + 12);
+                    runFrom.setHours(0);
+                    const runTill = new Date(promotion.offer.run_till);
+                    runTill.setHours(runTill.getHours() + 12);
+                    runTill.setHours(0);
+
+                    let prod = new Product();
+                    prod.n = promotion.offer.heading;
+                    prod.b = this.id();
+                    prod.c = null; //TODO maybe get some category info somehow
+
+                    prod.i = this.settings.dataSaver ? leafletPages[Object.keys(promotion.locations)[0] - 1]?.thumb : leafletPages[Object.keys(promotion.locations)[0] - 1]?.view;
+                    prod.ic = [width, height, top, right, bottom, left];
+                    prod.zi = leafletPages[Object.keys(promotion.locations)[0] - 1]?.view;
+
+                    prod.sd = runFrom.toISOString();
+                    prod.ed = runTill.toISOString();
+
+                    prod.p = promotion.offer.pricing.price.toFixed(2);
+                    prod.op = promotion.offer.pricing.pre_price?.toFixed(2);
+
+                    prod.ls = promotion.offer.quantity.size.from;
+                    if (promotion.offer.quantity.size.to != promotion.offer.quantity.size.from)
+                        prod.us = promotion.offer.quantity.size.to;
+                    prod.u = promotion.offer.quantity.unit.symbol;
+
+                    prod = productSetValue(productSetCategory(productSetUnit(prod)));
+
+                    addProduct(prod);
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            // addError(lang.errors.failedLeaflet(this.name)); TODO
+        }
+    }
+
+    async fetchLocal() {
+        //update store list daily
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (this.stored.storesLastUpdate == null || this.stored.storesLastUpdate < yesterday.toISOString()) {
+            this.stored.stores = await sallingTenantGet(this, "https://p-club.dsgapps.dk/api/cp/stores", lang.errors.failedStoreList(this.name));
+            this.stored.storesLastUpdate = (new Date()).toISOString();
+        }
+        this.store();
+
+        const filteredStores = this.stored.stores.filter(store => this.settings.enabledStoreList.some(enabledStore => JSON.stringify(store).toLowerCase().includes(enabledStore.toLowerCase())));
+
+        for (const store of filteredStores) {
+            try {
+                const storeData = await sallingTenantGet(this, `https://p-club.dsgapps.dk/api/cp/lpr/clearanceItems?id=${store.id}`, lang.errors.failedLocal(store.name, store.address.city));
+
+                for (const promotion of storeData.clearanceItems ?? []) {
+                    let prod = new Product();
+
+                    prod.n = promotion.titleTxt;
+                    prod.b = this.id();
+                    prod.sn = store.name;
+                    prod.c = promotion.categories.da;
+
+                    prod.i = promotion.imageUrl;
+
+                    prod.sd = parseSallingDate(promotion.lastUpdateTxt.split(':')[1].trim()).toISOString();
+
+                    prod.p = promotion.discountedPrice.toFixed(2);
+                    prod.op = promotion.regularPrice.toFixed(2);
+
+                    prod.st = promotion.availabilityRangeTxt.split('-')[0].trim().replace('Over ', '').split(' ')[0];
+                    prod = productSetValue(productSetCategory(productSetUnit(prod)));
+
+                    addProduct(prod);
+                }
+            } catch (e) {
+                console.log(e);
+                // addError(lang.errors.failedLocal(store.name, store.address.city)); TODO
+            }
+        }
+
+        productList.sort((a, b) => {
+            if (a.futurePromo != b.futurePromo) return a.futurePromo - b.futurePromo;
+            if (a.score != b.score) return a.score - b.score;
+            if (a.price != b.price) return a.price - b.price;
+            return 0
+        });
+        if (productList.length > 0) {
+            totalProducts += productList.length;
+            resultTabs.innerHTML += `<span class="storeHeader" id="storeHeader-${brand}" onclick="showGroup('${brand}');"><h3>${brand}</h3></div>`;
+            resultContent.innerHTML += `<div class="productGroup" id="productGroup-${brand}">${productList.map(e => e.html).join('')}</div>`;
+        } else {
+            // addWarning(lang.warnings.noPromotions(brand, productKeywords));
+        }
+
+        if (totalProducts > 0) {
+            if (visualOnlyRerun) {
+                // addMessages(lang.messages.foundPromotions(totalProducts, brandList.length, totalStores));
+                window.scroll({
+                    top: resultContent.getBoundingClientRect().top + window.scrollY,
+                    behavior: "smooth",
+                });
+            }
+        } else {
+            // addMessages(lang.messages.noPromotions)
+        }
+    }
+
     /**
-         * Validates and updates settings from the custom form UI
-         * @returns {boolean} Success status
-         */
+     * Validates and updates settings from the custom form UI
+     * @returns {boolean} Success status
+     */
     setSettings() {
         let success = true;
 
@@ -233,141 +360,6 @@ class Salling extends Brand {
             `;
     }
 
-    async fetchLeaflet() {
-        try {
-            const leafletsOrder = await sallingTenantGet(this, 'https://p-club.dsgapps.dk/api/cp/leafletsOrder', lang.errors.failedLeaflet(this.name));
-            for (let j = 0; j < leafletsOrder.leafletIds.length; j++) {
-                const leaflet = leafletsOrder.leafletIds[j];
-
-                const leafletInfo = await sallingGet(this, `https://squid-api.tjek.com/v2/catalogs/${leaflet}`, lang.errors.failedLeaflet(this.name));
-
-
-                if (this.settings.leafletBlacklist.some(e => leafletInfo?.label?.includes(e))) continue;
-
-                const leafletPages = await sallingGet(this, `https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, lang.errors.failedLeaflet(this.name));
-
-                const promotions = await sallingGet(this, `https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, lang.errors.failedLeaflet(this.name));
-
-                if (promotions.length > 0) {
-                    promotions.forEach(product => {
-                        const points = Object.values(product.locations)[0];
-                        const width = leafletInfo?.dimensions?.width ?? 1;
-                        const height = leafletInfo?.dimensions?.height ?? Math.SQRT2;
-                        let top = points[0][1];
-                        let right = width - points[2][0];
-                        let bottom = height - points[2][1];
-                        let left = points[0][0];
-
-                        const runFrom = new Date(product.offer.run_from);
-                        runFrom.setHours(runFrom.getHours() + 12);
-                        runFrom.setHours(0);
-                        const runTill = new Date(product.offer.run_till);
-                        runTill.setHours(runTill.getHours() + 12);
-                        runTill.setHours(0);
-
-                        let prod = new Product();
-                        prod.n = product.offer.heading;
-                        prod.b = this.id();
-                        prod.c = null; //TODO maybe get some category info somehow
-
-                        prod.i = this.settings.dataSaver ? leafletPages[Object.keys(product.locations)[0] - 1]?.thumb : leafletPages[Object.keys(product.locations)[0] - 1]?.view;
-                        prod.ic = [width, height, top, right, bottom, left];
-                        prod.zi = leafletPages[Object.keys(product.locations)[0] - 1]?.view;
-
-                        prod.sd = runFrom.toISOString();
-                        prod.ed = runTill.toISOString();
-
-                        prod.p = product.offer.pricing.price.toFixed(2);
-                        prod.op = product.offer.pricing.pre_price?.toFixed(2);
-
-                        prod.ls = product.offer.quantity.size.from;
-                        if (product.offer.quantity.size.to != product.offer.quantity.size.from)
-                            prod.us = product.offer.quantity.size.to;
-                        prod.u = product.offer.quantity.unit.symbol;
-
-                        prod = productSetUnit(prod);
-
-                        addProduct(prod);
-                    });
-                }
-            }
-        } catch (e) {
-            console.log(e);
-            // addError(lang.errors.failedLeaflet(this.name)); TODO
-        }
-    }
-
-    async fetchLocal() {
-        //update store list daily
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        if (this.stored.storesLastUpdate == null || this.stored.storesLastUpdate < yesterday.toISOString()) {
-            this.stored.stores = await sallingTenantGet(this, "https://p-club.dsgapps.dk/api/cp/stores", lang.errors.failedStoreList(this.name));
-            this.stored.storesLastUpdate = (new Date()).toISOString();
-        }
-        this.store();
-
-        const filteredStores = this.stored.stores.filter(store => this.settings.enabledStoreList.some(enabledStore => JSON.stringify(store).toLowerCase().includes(enabledStore.toLowerCase())));
-
-        for (const store of filteredStores) {
-            try {
-                const storeData = await sallingTenantGet(this, `https://p-club.dsgapps.dk/api/cp/lpr/clearanceItems?id=${store.id}`, lang.errors.failedLocal(store.name, store.address.city));
-
-                for (const promotion of storeData.clearanceItems ?? []) {
-                    let prod = new Product();
-
-                    prod.n = promotion.titleTxt;
-                    prod.b = this.id();
-                    prod.sn = store.name;
-                    prod.c = promotion.categories.da;
-
-                    prod.i = promotion.imageUrl;
-
-                    prod.sd = parseSallingDate(promotion.lastUpdateTxt.split(':')[1].trim()).toISOString();
-
-                    prod.p = promotion.discountedPrice.toFixed(2);
-                    prod.op = promotion.regularPrice.toFixed(2);
-
-                    prod.st = promotion.availabilityRangeTxt.split('-')[0].trim().replace('Over ', '').split(' ')[0];
-                    prod = productSetUnit(prod);
-
-                    addProduct(prod);
-                }
-            } catch (e) {
-                console.log(e);
-                // addError(lang.errors.failedLocal(store.name, store.address.city)); TODO
-            }
-        }
-
-        productList.sort((a, b) => {
-            if (a.futurePromo != b.futurePromo) return a.futurePromo - b.futurePromo;
-            if (a.score != b.score) return a.score - b.score;
-            if (a.price != b.price) return a.price - b.price;
-            return 0
-        });
-        if (productList.length > 0) {
-            totalProducts += productList.length;
-            resultTabs.innerHTML += `<span class="storeHeader" id="storeHeader-${brand}" onclick="showGroup('${brand}');"><h3>${brand}</h3></div>`;
-            resultContent.innerHTML += `<div class="productGroup" id="productGroup-${brand}">${productList.map(e => e.html).join('')}</div>`;
-        } else {
-            addWarning(lang.warnings.noPromotions(brand, productKeywords));
-
-        }
-
-        if (totalProducts > 0) {
-            if (visualOnlyRerun) {
-                addMessages(lang.messages.foundPromotions(totalProducts, brandList.length, totalStores));
-                window.scroll({
-                    top: resultContent.getBoundingClientRect().top + window.scrollY,
-                    behavior: "smooth",
-                });
-            }
-        } else {
-            addMessages(lang.messages.noPromotions)
-        }
-    }
-
-
     loyaltyHtml() {
         if (this.settings.loyaltyCode != null) {
             postRenderCallbacks.push(() => {
@@ -375,9 +367,11 @@ class Salling extends Brand {
                     JsBarcode(document.getElementById(`${this.id()}-svg`), this.settings.loyaltyCode, {
                         format: "ean13",
                         flat: true,
+                        fontSize: 0
                     });
                 } catch (error) {
-                    document.getElementById(`${this.id()}-svg`).replaceWith(error);
+                    document.getElementById(`${this.id()}-svg`).style.display = "none";
+                    //addError(error);
                 }
             });
             return `<svg id="${this.id()}-svg" class="sallingBarcode"></svg>`;

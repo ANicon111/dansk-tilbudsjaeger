@@ -16,6 +16,7 @@ class Brand {
         loyaltyCode: null,
         productKeywords: [],
         updatePeriodMinutes: 120, //Should be a sane default for leaflet-only stores
+        ignoreThreshold: 200,
     };
     stored = {};
 
@@ -199,10 +200,12 @@ function productSetCategory(prod) {
     // flatten stage (for eventual existing categories)
     switch (prod.c) { //TODO
         case "fruitsandvegetables":
+        case "Frugt og Grønt - Dyrk Prisen!":
             prod.c = "fruitsandvegetables";
             break;
         case "meat":
         case "Kød & fisk":
+        case "Ugens kød og fisk":
             prod.c = "meat";
             break;
         case "dairy":
@@ -256,6 +259,7 @@ function productSetUnit(prod) {
     // flatten stage (for different names for the same unit)
     switch (prod.u) {
         case "pcs":
+        case "x":
             prod.u = "piece"
             break;
     }
@@ -299,16 +303,14 @@ function productSetUnit(prod) {
  * @param {Product} prod 
  */
 function productSetValue(prod) {
-    const currentTime = new Date().toISOString();                                     // if a product is not available, value is very small
-    if (prod.sd > currentTime || currentTime > (prod.ed ?? currentTime)) {
-        prod.v = 0.0001;
-    }
 
     const base = 1 / prod.lpu;                                          // based on the price per unit, giving the best initial value
+    const currentTime = new Date().toISOString();                       // if a product is not available, value is very small
+    const notAvailableModifier = (prod.sd > currentTime || currentTime > (prod.ed ?? currentTime)) ? 0.0001 : 1;
     const existingModifier = prod.v ?? 1;                               // this allows for modifiers set by fetch scripts
     const discountModifier = Math.sqrt((prod.op ?? prod.p) / prod.p);   // sqrt because discount %s only roughly indicate value
+    let unitModifier = 1;                                               // some units imply worse values, or for piece prices, less knowledge
 
-    let unitModifier = 1;
     switch (prod.u) {
         case "piece":
             unitModifier = 0.5;
@@ -332,7 +334,7 @@ function productSetValue(prod) {
     if (stock >= 10) stockModifier = 1.25;
     if (stock < 5) stockModifier = 0.66;
 
-    prod.v = base * existingModifier;
+    prod.v = base * notAvailableModifier * existingModifier * discountModifier * unitModifier * stockModifier;
     return prod;
 }
 

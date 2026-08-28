@@ -185,6 +185,14 @@ body {
     height: auto;
 }
 
+.lidlQR {
+    aspect-ratio: 1;
+    width: min(calc(100% - 2rem), 20rem);
+    height: auto;
+    padding: 1rem;
+    background-color: white;
+}
+
 .sallingSettingsContainer {
     margin: auto;
     display: flex;
