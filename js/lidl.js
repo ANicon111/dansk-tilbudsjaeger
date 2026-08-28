@@ -120,7 +120,6 @@ class Lidl extends Brand {
 
                         prod = productSetValue(productSetCategory(productSetUnit(prod)));
                         addProduct(prod);
-                        tot++;
                     }
                 }
             }
