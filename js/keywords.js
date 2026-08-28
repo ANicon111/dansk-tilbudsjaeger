@@ -215,7 +215,7 @@ const keywords = {
     "minimælk": new Keyword("dairy", 1, "l"),
     "skummetmælk": new Keyword("dairy", 1, "l"),
     "sødmælk": new Keyword("dairy", 1, "l"),
-    "mælke": new Keyword("dairy", 100, "g"),
+    "mælke": new Keyword("dessert", 100, "g"),
     "mælk": new Keyword("dairy", 1, "l", false),
 
     // --- Olie family ---
