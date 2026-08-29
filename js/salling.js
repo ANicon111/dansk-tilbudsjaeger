@@ -15,17 +15,17 @@ function sallingGet(url, errorMessage) {
 }
 
 /**
- * @param {Salling} sallingBrand
  * @param {string} url 
+ * @param {string} tenantAlias 
  * @param {string | null} errorMessage 
  * @returns {* | null}
  */
-function sallingTenantGet(sallingBrand, url, errorMessage) {
+function sallingTenantGet(url, tenantAlias, errorMessage) {
     return genericGet(
         url,
         {
             "Accept-Encoding": "text/json",
-            "X-tenantAlias": sallingBrand.tenantAlias,
+            "X-tenantAlias": tenantAlias,
         },
         errorMessage
     );
@@ -83,6 +83,7 @@ class Salling extends Brand {
         this.accentColor = accentColor;
         this.settings.leafletBlacklist = leafletBlacklist;
         this.settings.enabledStoreList = [];
+        this.settings.maxStoresPerEnabled = 3;
         this.settings.dataSaver = false;
         this.stored.stores = [];
         this.stored.storesLastUpdate = null;
@@ -97,18 +98,25 @@ class Salling extends Brand {
 
     async fetchLeaflet() {
         try {
-            const leafletsOrder = await sallingTenantGet(this, 'https://p-club.dsgapps.dk/api/cp/leafletsOrder', lang.errors.failedLeaflet(this.name));
-            for (let j = 0; j < leafletsOrder.leafletIds.length; j++) {
-                const leaflet = leafletsOrder.leafletIds[j];
+            const leafletsOrder = await sallingTenantGet('https://p-club.dsgapps.dk/api/cp/leafletsOrder', this.tenantAlias, lang.errors.failedLeaflet(this.name));
+            const leafletPromises = [];
+            for (const leaflet of leafletsOrder.leafletIds) {
+                leafletPromises.push({
+                    info: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, lang.errors.failedLeaflet(this.name)),
+                    pages: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, lang.errors.failedLeaflet(this.name)),
+                    promotions: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, lang.errors.failedLeaflet(this.name)),
+                });
 
-                const leafletInfo = await sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, lang.errors.failedLeaflet(this.name));
+            }
+            for (const leafletPromise of leafletPromises) {
+                const leafletInfo = await leafletPromise.info;
 
 
                 if (this.settings.leafletBlacklist.some(e => leafletInfo?.label?.includes(e))) continue;
 
-                const leafletPages = await sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, lang.errors.failedLeaflet(this.name));
+                const leafletPages = await leafletPromise.pages;
 
-                const promotions = await sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, lang.errors.failedLeaflet(this.name));
+                const promotions = await leafletPromise.promotions;
 
                 for (const promotion of promotions) {
                     const points = Object.values(promotion.locations)[0];
@@ -162,23 +170,39 @@ class Salling extends Brand {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         if (this.stored.storesLastUpdate == null || this.stored.storesLastUpdate < yesterday.toISOString()) {
-            this.stored.stores = await sallingTenantGet(this, "https://p-club.dsgapps.dk/api/cp/stores", lang.errors.failedStoreList(this.name));
+            this.stored.stores = await sallingTenantGet("https://p-club.dsgapps.dk/api/cp/stores", this.tenantAlias, lang.errors.failedStoreList(this.name));
             this.stored.storesLastUpdate = (new Date()).toISOString();
         }
         this.store();
 
-        const filteredStores = this.stored.stores.filter(store => this.settings.enabledStoreList.some(enabledStore => JSON.stringify(store).toLowerCase().includes(enabledStore.toLowerCase())));
+        const filteredStores = [];
+        for (const enabledStore of this.settings.enabledStoreList) {
+            const keyword = enabledStore.toLowerCase();
+            let count = 0;
 
-        for (const store of filteredStores) {
+            for (const store of this.stored.stores) {
+                if (count >= this.settings.maxStoresPerEnabled) break;
+                if (JSON.stringify(store).toLowerCase().includes(keyword) && !filteredStores.includes(store)) {
+                    filteredStores.push(store);
+                    count++;
+                }
+            }
+        }
+
+        const storePromises = [];
+        for (const store of filteredStores)
+            storePromises.push(sallingTenantGet(`https://p-club.dsgapps.dk/api/cp/lpr/clearanceItems?id=${store.id}`, this.tenantAlias, lang.errors.failedLocal(store.name, store.address.city)));
+
+        for (const storePromise of storePromises) {
             try {
-                const storeData = await sallingTenantGet(this, `https://p-club.dsgapps.dk/api/cp/lpr/clearanceItems?id=${store.id}`, lang.errors.failedLocal(store.name, store.address.city));
+                const storeData = await storePromise;
 
                 for (const promotion of storeData.clearanceItems ?? []) {
                     let prod = new Product();
 
                     prod.n = promotion.titleTxt;
                     prod.b = this.id();
-                    prod.sn = store.name;
+                    prod.sn = storeData.storeNameTxt;
                     prod.c = promotion.categories.da;
 
                     prod.i = promotion.imageUrl;
@@ -197,32 +221,6 @@ class Salling extends Brand {
                 console.log(e);
                 // addError(lang.errors.failedLocal(store.name, store.address.city)); TODO
             }
-        }
-
-        productList.sort((a, b) => {
-            if (a.futurePromo != b.futurePromo) return a.futurePromo - b.futurePromo;
-            if (a.score != b.score) return a.score - b.score;
-            if (a.price != b.price) return a.price - b.price;
-            return 0
-        });
-        if (productList.length > 0) {
-            totalProducts += productList.length;
-            resultTabs.innerHTML += `<span class="storeHeader" id="storeHeader-${brand}" onclick="showGroup('${brand}');"><h3>${brand}</h3></div>`;
-            resultContent.innerHTML += `<div class="productGroup" id="productGroup-${brand}">${productList.map(e => e.html).join('')}</div>`;
-        } else {
-            // addWarning(lang.warnings.noPromotions(brand, productKeywords));
-        }
-
-        if (totalProducts > 0) {
-            if (visualOnlyRerun) {
-                // addMessages(lang.messages.foundPromotions(totalProducts, brandList.length, totalStores));
-                window.scroll({
-                    top: resultContent.getBoundingClientRect().top + window.scrollY,
-                    behavior: "smooth",
-                });
-            }
-        } else {
-            // addMessages(lang.messages.noPromotions)
         }
     }
 
@@ -246,6 +244,7 @@ class Salling extends Brand {
             productKeywords: getEl('settingProductKeywords'),
             leafletBlacklist: getEl('settingLeafletBlacklist'),
             enabledStoreList: getEl('settingEnabledStoreList'),
+            maxStoresPerEnabled: getEl('settingMaxStoresPerEnabled'),
         };
 
         // Reset error styling
@@ -265,6 +264,15 @@ class Salling extends Brand {
             this.settings.updatePeriodMinutes = val;
         } else {
             setErr(elements.updatePeriodMinutes);
+            success = false;
+        }
+
+        val = parseInt(elements.maxStoresPerEnabled.value, 10);
+        if (!isNaN(val) && val > 0) {
+            if (val != this.settings.maxStoresPerEnabled) this.forceNextReload = true;
+            this.settings.maxStoresPerEnabled = val;
+        } else {
+            setErr(elements.maxStoresPerEnabled);
             success = false;
         }
 
@@ -351,6 +359,11 @@ class Salling extends Brand {
                 <div class="settingRow">
                     <label>Enabled Store Names/Locations (comma-separated)</label>
                     <input class="settingEnabledStoreList" type="text" value="${(s.enabledStoreList || []).join(', ')}" placeholder="e.g. Sønderborg, Lufthavn">
+                </div>
+
+                <div class="settingRow">
+                    <label>Max Fetched Stores per Enabled Entry</label>
+                    <input class="settingMaxStoresPerEnabled" type="number" min="1" value="${s.maxStoresPerEnabled}">
                 </div>
 
                 <div class="settingActions">
