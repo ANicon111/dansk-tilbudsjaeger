@@ -404,7 +404,7 @@ function productSetUnit(prod) {
     // flatten stage (for different names for the same unit)
     switch (prod.u) {
         case "pcs":
-        case "x":
+        case "Stk.":
             prod.u = "piece"
             break;
     }
@@ -448,14 +448,15 @@ function productSetUnit(prod) {
  * @param {Product} prod 
  */
 function productSetValue(prod) {
-
     const base = 1 / prod.lpu;                                          // based on the price per unit, giving the best initial value
-    const currentTime = new Date().toISOString();                       // if a product is not available, value is very small
-    const notAvailableModifier = (prod.sd > currentTime || currentTime > (prod.ed ?? currentTime)) ? 0.0001 : 1;
     const existingModifier = prod.v ?? 1;                               // this allows for modifiers set by fetch scripts
     const discountModifier = Math.sqrt((prod.op ?? prod.p) / prod.p);   // sqrt because discount %s only roughly indicate value
-    let unitModifier = 1;                                               // some units imply worse values, or for piece prices, less knowledge
+    const sizeGuessModifier = prod.us < 0 ? 0.5 : 1;                    // guessed size means less certain knowledge
 
+    const currentTime = new Date().toISOString();                       // if a product is not available, value is very small
+    const notAvailableModifier = (prod.sd > currentTime || currentTime > (prod.ed ?? currentTime)) ? 0.0001 : 1;
+
+    let unitModifier = 1;                                               // some units imply worse values, or for piece prices, less knowledge
     switch (prod.u) {
         case "piece":
             unitModifier = 0.5;
@@ -479,7 +480,8 @@ function productSetValue(prod) {
     if (stock >= 10) stockModifier = 1.25;
     if (stock < 5) stockModifier = 0.66;
 
-    prod.v = base * notAvailableModifier * existingModifier * discountModifier * unitModifier * stockModifier;
+    // console.log(base, notAvailableModifier, existingModifier, discountModifier, unitModifier, stockModifier, sizeGuessModifier, prod);
+    prod.v = base * notAvailableModifier * existingModifier * discountModifier * unitModifier * stockModifier * sizeGuessModifier;
     return prod;
 }
 
@@ -487,7 +489,7 @@ function productSetValue(prod) {
  * @param {Product} prod 
  */
 function addProduct(prod) {
-    const product = productSetValue(productSetCategory(productSetUnit(cloneProduct(prod))));
+    const product = cloneProduct(prod);
     let pid = productId(product);
     products[pid] = product;
     if (productIdsByBrandAndCategory[product.b] == null)
@@ -526,7 +528,7 @@ function productContainsKeyword(prod, keyword) {
     if (keywords[keyword].combined) {
         return productSearchString(prod).includes(keyword);
     }
-    return productSearchString(prod).split(' ').includes(keyword);
+    return productSearchString(prod).replaceAll('-', ' ').split(' ').includes(keyword);
 }
 
 

@@ -37,7 +37,7 @@ function productHtml(id) {
     const sizeGuess = prod.ls < 0;
     const endDate = prod.ed?.split("T")[0];
     return `
-        <div class="prod" id="${id}">
+        <div class="prod" id="${id}" data-value="${prod.v}">
             <div class="prodImage" style="${brandBackground(getBrandById(prod.b))}" onclick="zoomImage('${id}')"${prod.i == null ? ` disabled="true"` : ''}>
                 <img class="prodImageImage" ${imageCrop(prod.ic)} src="${prod.i ?? assets.placeholderProduct}" onerror="onErrorImage('${id}');">
             </div>

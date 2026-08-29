@@ -9,44 +9,59 @@ class Keyword {
 }
 
 const keywords = {
-    // --- Lexical Singletons (Alphabetical) ---
+    // Specific Brands
     "aalborg": new Keyword("drinks", 700, "ml"),
-    "agurk": new Keyword("fruitsandvegetables", 300, "g"),
     "akvavit": new Keyword("drinks", 700, "ml"),
     "albani": new Keyword("drinks", 330, "ml"),
-    "appelsiner": new Keyword("fruitsandvegetables", 200, "g"),
+    "aqua": new Keyword("drinks", 1, "l"),
     "arla": new Keyword("dairy", 500, "ml"),
+    "carlsberg": new Keyword("drinks", 330, "ml"),
+    "ceres": new Keyword("drinks", 330, "ml"),
+    "gammeldansk": new Keyword("drinks", 700, "ml"),
+    "egelykke": new Keyword("dairy", 200, "g"),
+    "harboe": new Keyword("drinks", 1, "l"),
+    "maaza": new Keyword("drinks", 330, "ml"),
+    "mogu": new Keyword("drinks", 320, "ml"),
+    "mokai": new Keyword("drinks", 330, "ml"),
+    "royal": new Keyword("drinks", 330, "ml"),
+    "tuborg": new Keyword("drinks", 330, "ml"),
+
+    // Common Modifiers
+    "postej": new Keyword("semiprepared", 400, "g"),
+    "sauce": new Keyword("cupboard", 400, "g"),
+
+    // Lexical Singletons
+    "agurk": new Keyword("fruitsandvegetables", 300, "g"),
+    "appelsiner": new Keyword("fruitsandvegetables", 200, "g"),
     "arnbitter": new Keyword("drinks", 700, "ml"),
     "aubergine": new Keyword("fruitsandvegetables", 300, "g"),
     "avocado": new Keyword("fruitsandvegetables", 150, "g"),
+    "bacon": new Keyword("meat", 200, "g"),
     "banan": new Keyword("fruitsandvegetables", 120, "g"),
     "broccoli": new Keyword("fruitsandvegetables", 350, "g"),
     "budding": new Keyword("dairy", 200, "g", false),
     "burger": new Keyword("semiprepared", 200, "g"),
-    "carlsberg": new Keyword("drinks", 330, "ml"),
-    "ceres": new Keyword("drinks", 330, "ml"),
     "champignon": new Keyword("fruitsandvegetables", 15, "g"),
     "chokoladebar": new Keyword("dessert", 50, "g"),
     "cider": new Keyword("drinks", 330, "ml"),
     "citron": new Keyword("fruitsandvegetables", 100, "g"),
     "curry": new Keyword("cupboard", 300, "g"),
     "druer": new Keyword("fruitsandvegetables", 6, "g"),
-    "egelykke": new Keyword("dairy", 200, "g"),
     "entrecote": new Keyword("meat", 1, "kg"),
     "falafel": new Keyword("semiprepared", 200, "g"),
     "figner": new Keyword("fruitsandvegetables", 100, "g"),
     "fiskefilet": new Keyword("fish", 500, "g"),
-    "gammeldansk": new Keyword("drinks", 700, "ml"),
     "gin": new Keyword("drinks", 700, "ml", false),
     "græskar": new Keyword("fruitsandvegetables", 1.5, "kg"),
     "grøntsag": new Keyword("fruitsandvegetables", 100, "g"),
     "gulerød": new Keyword("fruitsandvegetables", 75, "g"),
     "guacamole": new Keyword("cupboard", 200, "g"),
     "hamburgerryg": new Keyword("meat", 2, "kg"),
-    "harboe": new Keyword("drinks", 1, "l"),
     "havregryn": new Keyword("cupboard", 1, "kg"),
     "hummus": new Keyword("cupboard", 200, "g"),
+    "is": new Keyword("dessert", 330, "ml", false),
     "juice": new Keyword("drinks", 1, "l"),
+    "kakao": new Keyword("cupboard", 500, "g"),
     "kalveculotte": new Keyword("meat", 1, "kg"),
     "kebab": new Keyword("meat", 400, "g"),
     "kefir": new Keyword("dairy", 1, "kg"),
@@ -59,8 +74,8 @@ const keywords = {
     "lunchbite": new Keyword("bread", 100, "g"),
     "mango": new Keyword("fruitsandvegetables", 200, "g"),
     "margarine": new Keyword("dairy", 500, "ml", false),
+    "mayo": new Keyword("cupboard", 400, "g"),
     "medister": new Keyword("meat", 1, "kg"),
-    "mokai": new Keyword("drinks", 330, "ml"),
     "mozzarella": new Keyword("dairy", 125, "g"),
     "müslibar": new Keyword("cupboard", 50, "g"),
     "nakkefilet": new Keyword("meat", 2, "kg"),
@@ -79,12 +94,12 @@ const keywords = {
     "pærer": new Keyword("fruitsandvegetables", 150, "g"),
     "radiser": new Keyword("fruitsandvegetables", 10, "g"),
     "rejer": new Keyword("fish", 200, "g"),
+    "remoulade": new Keyword("cupboard", 400, "g"),
     "ribbenssteg": new Keyword("meat", 2, "kg"),
     "ribeye": new Keyword("meat", 1, "kg"),
     "ris": new Keyword("cupboard", 1, "kg"),
     "roastbeef": new Keyword("meat", 1, "kg"),
     "rom": new Keyword("drinks", 700, "ml", false),
-    "royal": new Keyword("drinks", 330, "ml"),
     "rødbeder": new Keyword("fruitsandvegetables", 100, "g"),
     "salami": new Keyword("meat", 20, "g", false),
     "salt": new Keyword("cupboard", 500, "g"),
@@ -96,17 +111,18 @@ const keywords = {
     "sodavand": new Keyword("drinks", 330, "ml"),
     "somersby": new Keyword("drinks", 330, "ml"),
     "spareribs": new Keyword("meat", 500, "g"),
+    "sparkling": new Keyword("drinks", 500, "ml"),
     "spinat": new Keyword("fruitsandvegetables", 5, "g"),
     "squash": new Keyword("fruitsandvegetables", 200, "g"),
     "sukker": new Keyword("cupboard", 1, "kg"),
     "survarer": new Keyword("fruitsandvegetables", 400, "g"),
     "sushi": new Keyword("semiprepared", 300, "g"),
+    "steak": new Keyword("meat", 500, "g"),
     "tacos": new Keyword("cupboard", 150, "g"),
     "tapas": new Keyword("semiprepared", 300, "g"),
     "thisted": new Keyword("drinks", 500, "ml"),
     "tomater": new Keyword("fruitsandvegetables", 80, "g"),
     "tortilla": new Keyword("bread", 300, "g"),
-    "tuborg": new Keyword("drinks", 330, "ml"),
     "whisky": new Keyword("drinks", 700, "ml"),
     "wienerschnitzel": new Keyword("meat", 1, "kg"),
     "wings": new Keyword("meat", 2, "kg", false),
@@ -114,42 +130,42 @@ const keywords = {
     "yoghurt": new Keyword("dairy", 1, "kg"),
     "æbler": new Keyword("fruitsandvegetables", 150, "g"),
 
-    // --- Blomme family ---
+    // Blomme family
     "blommeabrikoser": new Keyword("fruitsandvegetables", 40, "g"),
     "blommer": new Keyword("fruitsandvegetables", 50, "g"),
 
-    // --- Brød family ---
+    // Brød family
     "franskbrød": new Keyword("bread", 500, "g"),
     "knækbrød": new Keyword("bread", 250, "g"),
     "rugbrød": new Keyword("bread", 500, "g"),
     "brød": new Keyword("bread", 500, "g", false),
 
-    // --- Bær family ---
+    // Bær family
     "blåbær": new Keyword("fruitsandvegetables", 2, "g"),
     "hindbær": new Keyword("fruitsandvegetables", 5, "g"),
     "jordbær": new Keyword("fruitsandvegetables", 15, "g"),
     "bær": new Keyword("fruitsandvegetables", 5, "g", false),
 
-    // --- Drik family ---
+    // Drik family
     "energidrik": new Keyword("drinks", 500, "ml"),
     "proteindrik": new Keyword("dairy", 500, "ml"),
     "drikkeyoghurt": new Keyword("dairy", 330, "ml"),
 
-    // --- Flæsk family ---
+    // Flæsk family
     "flæskesteg": new Keyword("meat", 1.5, "kg"),
     "flæskesvær": new Keyword("meat", 100, "g"),
     "flæsk": new Keyword("meat", 1, "kg", false),
 
-    // --- Frugt family ---
+    // Frugt family
     "frugtstænger": new Keyword("cupboard", 100, "g"),
     "frugter": new Keyword("fruitsandvegetables", 150, "g"),
 
-    // --- Is family ---
+    // Is family
     "isbar": new Keyword("dessert", 250, "ml"),
     "iskasse": new Keyword("dessert", 500, "g"),
     "is": new Keyword("dessert", 500, "g", false),
 
-    // --- Kage family ---
+    // Kage family
     "chokoladekage": new Keyword("dessert", 400, "g"),
     "lagkagebunde": new Keyword("dessert", 400, "g"),
     "lagkage": new Keyword("dessert", 800, "g"),
@@ -157,60 +173,60 @@ const keywords = {
     "brownie": new Keyword("dessert", 200, "g"),
     "kage": new Keyword("dessert", 350, "g"),
 
-    // --- Kaffe family ---
+    // Kaffe family
     "instantkaffe": new Keyword("cupboard", 100, "g"),
     "kaffebønner": new Keyword("cupboard", 1, "kg"),
     "kaffe": new Keyword("cupboard", 500, "g", false),
 
-    // --- Kartoffel family ---
+    // Kartoffel family
     "flødekartofler": new Keyword("semiprepared", 1, "kg"),
     "kartofler": new Keyword("fruitsandvegetables", 100, "g"),
 
-    // --- Kylling family ---
+    // Kylling family
     "kyllingebrystfilet": new Keyword("meat", 1, "kg"),
     "kyllingeinderfilet": new Keyword("meat", 1, "kg"),
     "kyllingekød": new Keyword("meat", 1, "kg"),
     "kylling": new Keyword("meat", 1.4, "kg", false),
 
-    // --- Kål family ---
+    // Kål family
     "blomkål": new Keyword("fruitsandvegetables", 800, "g"),
     "hvidkål": new Keyword("fruitsandvegetables", 1.2, "kg"),
     "rødkål": new Keyword("fruitsandvegetables", 1.2, "kg"),
     "spidskål": new Keyword("fruitsandvegetables", 500, "g"),
     "kål": new Keyword("fruitsandvegetables", 500, "g", false),
 
-    // --- Kød family ---
+    // Kød family
     "grisekød": new Keyword("meat", 1.5, "kg"),
     "oksekød": new Keyword("meat", 1, "kg"),
     "kødboller": new Keyword("meat", 1.5, "kg"),
 
-    // --- Leverpostej family ---
+    // Leverpostej family
     "baconleverpostej": new Keyword("meat", 200, "g"),
     "franskleverpostej": new Keyword("meat", 200, "g"),
     "grovleverpostej": new Keyword("meat", 200, "g"),
     "leverpostej": new Keyword("meat", 200, "g", false),
 
-    // --- Løg family ---
+    // Løg family
     "forårsløg": new Keyword("fruitsandvegetables", 15, "g"),
     "hvidløg": new Keyword("fruitsandvegetables", 50, "g"),
     "rødløg": new Keyword("fruitsandvegetables", 100, "g"),
     "zittauerløg": new Keyword("fruitsandvegetables", 100, "g"),
     "løg": new Keyword("fruitsandvegetables", 100, "g", false),
 
-    // --- Majs family ---
+    // Majs family
     "majskolbe": new Keyword("fruitsandvegetables", 200, "g"),
     "majs": new Keyword("fruitsandvegetables", 200, "g", false),
 
-    // --- Mel family ---
+    // Mel family
     "hvedemel": new Keyword("cupboard", 1, "kg"),
     "rugmel": new Keyword("cupboard", 1, "kg"),
     "mel": new Keyword("cupboard", 1, "kg", false),
 
-    // --- Melon family ---
+    // Melon family
     "vandmelon": new Keyword("fruitsandvegetables", 5, "kg"),
     "melon": new Keyword("fruitsandvegetables", 1, "kg"),
 
-    // --- Mælk family ---
+    // Mælk family
     "kærnemælk": new Keyword("dairy", 1, "l"),
     "letmælk": new Keyword("dairy", 1, "l"),
     "minimælk": new Keyword("dairy", 1, "l"),
@@ -219,18 +235,18 @@ const keywords = {
     "mælke": new Keyword("dessert", 100, "g"),
     "mælk": new Keyword("dairy", 1, "l", false),
 
-    // --- Olie family ---
+    // Olie family
     "olivenolie": new Keyword("cupboard", 500, "ml"),
     "rapsolie": new Keyword("cupboard", 1, "l"),
     "olie": new Keyword("cupboard", 500, "ml", false),
 
-    // --- Ost family ---
+    // Ost family
     "dessertost": new Keyword("dairy", 150, "g"),
     "flødeost": new Keyword("dairy", 200, "g"),
     "hytteost": new Keyword("dairy", 300, "g"),
     "ost": new Keyword("dairy", 300, "g", false),
 
-    // --- Pasta family ---
+    // Pasta family
     "fusilli": new Keyword("cupboard", 500, "g"),
     "lasagnebunde": new Keyword("cupboard", 500, "g"),
     "macaroni": new Keyword("cupboard", 500, "g"),
@@ -238,38 +254,40 @@ const keywords = {
     "spaghetti": new Keyword("cupboard", 500, "g"),
     "pasta": new Keyword("cupboard", 500, "g", false),
 
-    // --- Pizza family ---
+    // Pizza family
     "pizzasauce": new Keyword("cupboard", 400, "g"),
     "pizza": new Keyword("semiprepared", 350, "g", false),
 
-    // --- Pålæg family ---
+    // Pålæg family
     "pålægschokolade": new Keyword("dessert", 400, "g"),
     "pålæg": new Keyword("semiprepared", 100, "g"),
 
-    // --- Salat family ---
+    // Salat family
     "salatost": new Keyword("dairy", 200, "g"),
     "icebergsalat": new Keyword("fruitsandvegetables", 200, "g", false),
     "isbjergsalat": new Keyword("fruitsandvegetables", 200, "g", false),
     "salat": new Keyword("fruitsandvegetables", 200, "g", false),
 
-    // --- Te family ---
+    // Te family
     "tebreve": new Keyword("cupboard", 50, "g"),
     "te": new Keyword("cupboard", 100, "g", false),
 
-    // --- Vin family ---
+    // Vin family
     "hvidvin": new Keyword("drinks", 750, "ml"),
     "rosévin": new Keyword("drinks", 750, "ml"),
     "rødvin": new Keyword("drinks", 750, "ml"),
     "vin": new Keyword("drinks", 750, "ml", false),
 
-    // --- Æg family ---
+    // Æg family
     "frilandsæg": new Keyword("eggs", 1, "piece"),
     "skrabeæg": new Keyword("eggs", 1, "piece"),
     "buræg": new Keyword("eggs", 1, "piece"),
     "økoæg": new Keyword("eggs", 1, "piece"),
     "æg": new Keyword("eggs", 1, "piece", false),
 
-    // --- Øl family ---
+    // Øl family
     "specialøl": new Keyword("drinks", 500, "ml"),
-    "øl": new Keyword("drinks", 330, "ml", false)
-};
+    "øl": new Keyword("drinks", 330, "ml", false),
+}; //TODO: improve and remove overly specific at the end
+
+//TODO user defined keywords, starting from the product title

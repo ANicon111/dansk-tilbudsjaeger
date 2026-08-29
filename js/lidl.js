@@ -120,6 +120,7 @@ class Lidl extends Brand {
                     const promotions = await promotionPromise;
 
                     for (const promotion of promotions.products) {
+                        console.log(promotion);
                         if (promotion.isOnline) continue; // skip the lidl online products
                         let prod = new Product();
                         prod.n = promotion.title;
@@ -137,15 +138,23 @@ class Lidl extends Brand {
                         prod.p = promotion.mainPrice?.price != null ? promotion.mainPrice.price.toFixed(2) : null;
                         prod.op = promotion.mainPrice?.oldPrice != null ? promotion.mainPrice.oldPrice.toFixed(2) : null;
 
-                        // Parse "1 l" using string splitting instead of regex
-                        const unitInfo = promotion.additionalInfo || promotion.mainPrice?.disclaimers?.[0] || "";
-                        const parts = unitInfo.trim().split(" ");
+                        // Parse "15 x 300 ml | Pr. l 10,00"
+                        const parts = promotion.additionalInfo.split('|')[0].split('x');
 
                         if (parts.length >= 2) {
-                            const parsedSize = parseFloat(parts[0].replace(",", "."));
-                            if (!isNaN(parsedSize)) {
-                                prod.ls = parsedSize;
-                                prod.u = parts[1];
+                            const count = parts[0].trim();
+                            const sizeAndUnit = parts[1].trim().split(' ');
+                            const size = parseFloat(count.replace(",", ".")) * parseFloat(sizeAndUnit[0].replace(",", "."));
+                            if (!isNaN(size)) {
+                                prod.ls = size;
+                                prod.u = sizeAndUnit[1];
+                            }
+                        } else {
+                            const sizeAndUnit = parts[0].trim().split(' ');
+                            const size = parseFloat(sizeAndUnit[0].replace(",", "."));
+                            if (!isNaN(size)) {
+                                prod.ls = size;
+                                prod.u = sizeAndUnit[1];
                             }
                         }
 
