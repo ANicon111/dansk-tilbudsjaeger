@@ -82,12 +82,81 @@ class Salling extends Brand {
         this.tenantAlias = tenantAlias;
         this.accentColor = accentColor;
         this.settings.leafletBlacklist = leafletBlacklist;
+        this.settingConfigs.leafletBlacklist = new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Leaflet Blacklist (comma-separated)</label>
+                        <input class="setting-leafletBlacklist" type="text" value="${(settings.leafletBlacklist || []).join(', ')}" placeholder="e.g. nonfood, Prosonic">
+                    </div>
+                `;
+            },
+            (settings) => {
+                this.settings.leafletBlacklist = document.getElementsByClassName("setting-leafletBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                return true;
+            }
+        );
         this.settings.enabledStoreList = [];
+        this.settingConfigs.enabledStoreList = new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Enabled Store Names/Locations (comma-separated)</label>
+                        <input class="setting-enabledStoreList" type="text" value="${(settings.enabledStoreList || []).join(', ')}" placeholder="e.g. Sønderborg, Lufthavn">
+                    </div>
+                `;
+            },
+            (settings) => {
+                const newList = document.getElementsByClassName("setting-enabledStoreList")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                if (JSON.stringify(this.settings.enabledStoreList) !== JSON.stringify(newList)) {
+                    this.forceNextReload = true;
+                }
+                this.settings.enabledStoreList = newList;
+                return true;
+            }
+        );
         this.settings.maxStoresPerEnabled = 3;
+        this.settingConfigs.maxStoresPerEnabled = new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Max Fetched Stores per Enabled Entry</label>
+                        <input class="setting-maxStoresPerEnabled" type="number" min="1" value="${settings.maxStoresPerEnabled}">
+                    </div>
+                `;
+            },
+            (settings) => {
+                const val = parseInt(document.getElementsByClassName("setting-maxStoresPerEnabled")[0].value, 10);
+                if (!isNaN(val) && val > 0) {
+                    if (val != this.settings.maxStoresPerEnabled) this.forceNextReload = true;
+                    this.settings.maxStoresPerEnabled = val;
+                } else {
+                    setErr(document.getElementsByClassName("setting-maxStoresPerEnabled")[0]);
+                    success = false;
+                }
+            }
+        );
         this.settings.dataSaver = false;
+        this.settingConfigs.dataSaver = new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow checkboxRow">
+                        <label class="settingLabelCheckbox">
+                            <input class="setting-dataSaver" type="checkbox" ${settings.dataSaver ? 'checked' : ''}>
+                            <span>Data Saver Mode</span>
+                        </label>
+                    </div>
+                `;
+            },
+            (settings) => {
+                this.settings.dataSaver = document.getElementsByClassName("setting-dataSaver")[0].checked ?? false;
+                return true;
+            }
+        );
+
+        this.settings.updatePeriodMinutes = 30; //This should account for local prices that may change often
         this.stored.stores = [];
         this.stored.storesLastUpdate = null;
-        this.settings.updatePeriodMinutes = 30; //This should account for local prices that may change often
     }
 
     async fetch() {
@@ -222,155 +291,6 @@ class Salling extends Brand {
                 // addError(lang.errors.failedLocal(store.name, store.address.city)); TODO
             }
         }
-    }
-
-    /**
-     * Validates and updates settings from the custom form UI
-     * @returns {boolean} Success status
-     */
-    setSettings() {
-        let success = true;
-
-        const getEl = (className) => document.getElementsByClassName(className)[0];
-        const clearErr = (el) => el && (el.style.backgroundColor = "");
-        const setErr = (el) => el && (el.style.backgroundColor = "rgb(160,40,40)");
-
-        const elements = {
-            enabled: getEl('settingEnabled'),
-            dataSaver: getEl('settingDataSaver'),
-            loyaltyCode: getEl('settingLoyaltyCode'),
-            updatePeriodMinutes: getEl('settingUpdatePeriodMinutes'),
-            ignoreThreshold: getEl('settingIgnoreThreshold'),
-            productKeywords: getEl('settingProductKeywords'),
-            leafletBlacklist: getEl('settingLeafletBlacklist'),
-            enabledStoreList: getEl('settingEnabledStoreList'),
-            maxStoresPerEnabled: getEl('settingMaxStoresPerEnabled'),
-        };
-
-        // Reset error styling
-        Object.values(elements).forEach(clearErr);
-
-        // Parse & Validate Booleans
-        this.settings.enabled = elements.enabled.checked;
-        this.settings.dataSaver = elements.dataSaver.checked;
-
-        // Parse Loyalty Code
-        const code = elements.loyaltyCode.value.trim();
-        this.settings.loyaltyCode = code.length > 0 ? code : null;
-
-        // Parse Numbers
-        let val = parseInt(elements.updatePeriodMinutes.value, 10);
-        if (!isNaN(val) && val > 0) {
-            this.settings.updatePeriodMinutes = val;
-        } else {
-            setErr(elements.updatePeriodMinutes);
-            success = false;
-        }
-
-        val = parseInt(elements.maxStoresPerEnabled.value, 10);
-        if (!isNaN(val) && val > 0) {
-            if (val != this.settings.maxStoresPerEnabled) this.forceNextReload = true;
-            this.settings.maxStoresPerEnabled = val;
-        } else {
-            setErr(elements.maxStoresPerEnabled);
-            success = false;
-        }
-
-        val = parseInt(elements.ignoreThreshold.value, 10);
-        if (!isNaN(val) && val >= 0) {
-            this.settings.ignoreThreshold = val;
-        } else {
-            setErr(elements.ignoreThreshold);
-            success = false;
-        }
-
-        // Helper to turn comma-separated text into array
-        const parseList = (inputEl) => {
-            if (!inputEl) return [];
-            return inputEl.value
-                .split(',')
-                .map(item => item.trim())
-                .filter(item => item.length > 0);
-        };
-
-        // Parse Array Fields
-        this.settings.productKeywords = parseList(elements.productKeywords);
-
-        this.settings.leafletBlacklist = parseList(elements.leafletBlacklist);
-
-        const newList = parseList(elements.enabledStoreList);
-        if (JSON.stringify(this.settings.enabledStoreList) !== JSON.stringify(newList)) {
-            this.forceNextReload = true;
-        }
-        this.settings.enabledStoreList = newList;
-
-        if (success) {
-            this.store();
-        }
-
-        return success;
-    }
-
-    settingsHtml() {
-        const s = this.settings;
-        return `
-            <div class="sallingSettingsContainer">
-                <h2 class="sallingSettingsTitle">${this.name} Settings</h2>
-
-                <div class="settingRow checkboxRow">
-                    <label class="settingLabelCheckbox">
-                        <input class="settingEnabled" type="checkbox" ${s.enabled ? 'checked' : ''}>
-                        <span>Enable Store</span>
-                    </label>
-                </div>
-
-                <div class="settingRow checkboxRow">
-                    <label class="settingLabelCheckbox">
-                        <input class="settingDataSaver" type="checkbox" ${s.dataSaver ? 'checked' : ''}>
-                        <span>Data Saver Mode</span>
-                    </label>
-                </div>
-
-                <div class="settingRow">
-                    <label>Loyalty Code</label>
-                    <input class="settingLoyaltyCode" type="text" value="${s.loyaltyCode ?? ''}" placeholder="Enter loyalty code">
-                </div>
-
-                <div class="settingRow">
-                    <label>Update Period (Minutes)</label>
-                    <input class="settingUpdatePeriodMinutes" type="number" min="1" value="${s.updatePeriodMinutes}">
-                </div>
-
-                <div class="settingRow">
-                    <label>Ignore Threshold</label>
-                    <input class="settingIgnoreThreshold" type="number" min="0" value="${s.ignoreThreshold}">
-                </div>
-
-                <div class="settingRow">
-                    <label>Product Keywords (comma-separated)</label>
-                    <input class="settingProductKeywords" type="text" value="${(s.productKeywords || []).join(', ')}" placeholder="e.g. milk, butter, coffee">
-                </div>
-
-                <div class="settingRow">
-                    <label>Leaflet Blacklist (comma-separated)</label>
-                    <input class="settingLeafletBlacklist" type="text" value="${(s.leafletBlacklist || []).join(', ')}" placeholder="e.g. wine, electronics">
-                </div>
-
-                <div class="settingRow">
-                    <label>Enabled Store Names/Locations (comma-separated)</label>
-                    <input class="settingEnabledStoreList" type="text" value="${(s.enabledStoreList || []).join(', ')}" placeholder="e.g. Sønderborg, Lufthavn">
-                </div>
-
-                <div class="settingRow">
-                    <label>Max Fetched Stores per Enabled Entry</label>
-                    <input class="settingMaxStoresPerEnabled" type="number" min="1" value="${s.maxStoresPerEnabled}">
-                </div>
-
-                <div class="settingActions">
-                    <button class="settingsApplyBtn" onclick="applyAndCloseSettings('${this.id()}');">Apply</button>
-                </div>
-            </div>
-            `;
     }
 
     loyaltyHtml() {

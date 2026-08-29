@@ -72,8 +72,38 @@ class Lidl extends Brand {
         this.shorthand = this.name;
         this.accentColor = [2, 64, 136];
         this.settings.promotionCategoryBlacklist = [];
+        this.settingConfigs.promotionCategoryBlacklist = new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Promotion Category Blacklist (comma-separated)</label>
+                        <input class="setting-promotionCategoryBlacklist" type="text" value="${(settings.promotionCategoryBlacklist || []).join(', ')}" placeholder="e.g. parkside, Frugt og Grønt">
+                    </div>
+                `;
+            },
+            (settings) => {
+                this.settings.promotionCategoryBlacklist = document.getElementsByClassName("setting-promotionCategoryBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                return true;
+            }
+        );
         this.settings.printReceipt = false;
-        this.settings.ignoreThreshold = 200;
+        this.settingConfigs.printReceipt = new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow checkboxRow">
+                        <label class="settingLabelCheckbox">
+                            <input class="setting-printReceipt" type="checkbox" ${settings.printReceipt ? 'checked' : ''}>
+                            <span>Print Receipt</span>
+                        </label>
+                    </div>
+                `;
+            },
+            (settings) => {
+                settings.printReceipt = document.getElementsByClassName("setting-printReceipt")[0].checked;
+                return true;
+            }
+        );
+
         this.settings.updatePeriodMinutes = 1440; //TODO default daily updates until I remove cors proxy
     }
 
@@ -83,7 +113,8 @@ class Lidl extends Brand {
             for (const week of leafletOrder.groups) {
                 const promotionPromises = [];
                 for (const campaign of week.campaigns)
-                    promotionPromises.push(lidlGet(`https://digital-leaflet.lidlplus.com/api/v1/DK/campaigns/${campaign.id}`, lang.errors.failedLeaflet(this.name)));
+                    if (!this.settings.promotionCategoryBlacklist.some(blacklisted => campaign.title.toLowerCase().includes(blacklisted.toLowerCase())))
+                        promotionPromises.push(lidlGet(`https://digital-leaflet.lidlplus.com/api/v1/DK/campaigns/${campaign.id}`, lang.errors.failedLeaflet(this.name)));
 
                 for (const promotionPromise of promotionPromises) {
                     const promotions = await promotionPromise;

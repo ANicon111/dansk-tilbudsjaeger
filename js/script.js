@@ -46,7 +46,7 @@ function productHtml(id) {
                 <span class="prodPrice">${prod.p} DKK</span>
                 ${prod.op ? `<small class="prodOldPrice">${prod.op} DKK</small>` : ''}
                 <br>
-                ${prod.op ? `<p class="prodStore">${prod.sn}</p>` : ''}
+                ${prod.sn ? `<p class="prodStore">${prod.sn}</p>` : ''}
                 <span class="prodSize">${sizeGuess ? `~ ${-prod.ls}` : prod.ls}${prod.us != null ? ` - ${prod.us}` : ''} ${prod.u}, </span>
                 <span class="prodPricePerUnit">${prod.lpu != prod.upu ? `${prod.lpu} - ` : ''}${prod.upu} DKK / ${unitToSI(prod.u)}</span>
                 <br>

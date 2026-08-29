@@ -27,13 +27,15 @@
 </head>
 
 <body onload="main();">
-  <main id="frame">
-    <h1>An application that aggregates and sorts product data from danish stores.</h1>
-    <h2>This page requires JavaScript to work.</h2>
-  </main>
-  <div id="brandSelector"></div>
-  <div id="brandSettings"></div>
-  <img id="zoom" onclick="closeZoomImage();">
+  <div id="pseudoBody">
+    <main id="frame">
+      <h1>An application that aggregates and sorts product data from danish stores.</h1>
+      <h2>This page requires JavaScript to work.</h2>
+    </main>
+    <div id="brandSelector"></div>
+    <div id="brandSettings" onclick="document.getElementById('brandSettings').style.display='none';"></div>
+    <img id="zoom" onclick="closeZoomImage();">
+  </div>
 </body>
 
 </html>

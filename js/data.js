@@ -3,12 +3,64 @@ class Store {
     id = "";
 }
 
+class SettingConfig {
+    constructor(html = null, parseAndStore = null) {
+        if (typeof html === 'function') this.html = html;
+        if (typeof parseAndStore === 'function') this.parseAndStore = parseAndStore;
+    }
+    /**
+     * @param {*} settings 
+     * @returns {string}
+     * @abstract
+     */
+    html(settings) {
+        return null;
+    }
+
+    /**
+     * @param {*} settings 
+     * @returns {bool} true if succeded
+     * @abstract
+     */
+    parseAndStore(settings) {
+        return false;
+    }
+}
+
+/**
+ * 
+ * @param {string} name 
+ * @returns {SettingConfig}
+ */
+function defaultSettingConfig(name) {
+    return {
+        name: name,
+        html(settings) {
+            return `
+            <div class="settingRow">
+                <label>${this.name}</label>
+                <input class="setting-${this.name}" type="text" value="${JSON.stringify(settings[this.name]).replaceAll("\"", "&quot;")}" placeholder="Enter ${this.name}">
+            </div>
+        `;
+        },
+        parseAndStore(settings) {
+            try {
+                settings[this.name] = JSON.parse(document.getElementsByClassName(`setting-${this.name}`)[0].value)
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+            return true;
+        },
+    };
+}
 
 class Brand {
     name = "";
     /** Must be at most 5 characters long */
     shorthand = "";
     accentColor = [0, 0, 0];
+
 
     //these are stored in localStorage
     settings = {
@@ -19,6 +71,93 @@ class Brand {
         ignoreThreshold: 200,
     };
     stored = {};
+
+    /** @type {Object<string,SettingConfig>} */
+    settingConfigs = {
+        enabled: new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow checkboxRow">
+                        <label class="settingLabelCheckbox">
+                            <input class="setting-enabled" type="checkbox" ${settings.enabled ? 'checked' : ''}>
+                            <span>Enable Store</span>
+                        </label>
+                    </div>
+                `;
+            },
+            (settings) => {
+                settings.enabled = document.getElementsByClassName("setting-enabled")[0].checked;
+                return true;
+            }
+        ),
+        loyaltyCode: new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Loyalty Code</label>
+                        <input class="setting-loyaltyCode" type="text" value="${settings.loyaltyCode ?? ''}" placeholder="Enter loyalty code">
+                    </div>
+                `;
+            },
+            (settings) => {
+                const code = document.getElementsByClassName("setting-loyaltyCode")[0].value.trim();
+                settings.loyaltyCode = code.length > 0 ? code : null;
+                return true;
+            }
+        ),
+        productKeywords: new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Product Keywords (comma-separated)</label>
+                        <input class="setting-productKeywords" type="text" value="${(settings.productKeywords || []).join(', ')}" placeholder="e.g. milk, butter, coffee">
+                    </div>
+                `;
+            },
+            (settings) => {
+                this.settings.productKeywords = document.getElementsByClassName("setting-productKeywords")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                return true;
+            }
+        ),
+        updatePeriodMinutes: new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Update Period (Minutes)</label>
+                        <input class="setting-updatePeriodMinutes" type="number" min="1" value="${settings.updatePeriodMinutes}">
+                    </div>
+                `;
+            },
+            (settings) => {
+                const val = parseInt(document.getElementsByClassName("setting-updatePeriodMinutes")[0].value, 10);
+                if (!isNaN(val) && val > 0) {
+                    this.settings.updatePeriodMinutes = val;
+                } else {
+                    return false;
+                }
+                return true;
+            }
+        ),
+        ignoreThreshold: new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow">
+                        <label>Ignore Threshold</label>
+                        <input class="setting-ignoreThreshold" type="number" min="0" value="${settings.ignoreThreshold}">
+                    </div>
+                `;
+            },
+            (settings) => {
+                const val = parseInt(document.getElementsByClassName("setting-ignoreThreshold")[0].value, 10);
+                if (!isNaN(val) && val >= 0) {
+                    this.settings.ignoreThreshold = val;
+                } else {
+                    return false;
+                }
+                return true;
+            }
+        ),
+    }
 
     /**
      * @param {Brand} brand 
@@ -61,15 +200,12 @@ class Brand {
         }
     }
 
-
-    // generic settings system that may be overriden
     setSettings() {
         let success = true;
-        for (const property of Object.keys(this.settings)) {
+        for (const property in this.settings) {
+            console.log(`setting-${property}`);
             document.getElementsByClassName(`setting-${property}`)[0].style.backgroundColor = null;
-            try {
-                this.settings[property] = JSON.parse(document.getElementsByClassName(`setting-${property}`)[0].value);
-            } catch (e) {
+            if (!(this.settingConfigs[property]?.parseAndStore(this.settings) ?? defaultSettingConfig(property).parseAndStore(this.settings))) {
                 document.getElementsByClassName(`setting-${property}`)[0].style.backgroundColor = "rgb(160,40,40)";
                 success = false;
             }
@@ -77,12 +213,21 @@ class Brand {
         if (success) this.store();
         return success;
     }
+
     settingsHtml() {
-        let html = "";
-        for (const property of Object.keys(this.settings)) {
-            html += `<label>${property[0].toUpperCase() + property.slice(1)} value:</label><input class="setting-${property}" type="text" value="${JSON.stringify(this.settings[property]).replaceAll('"', "&quot;")}">`;
+        let html = `
+            <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
+                <h2 class="sallingSettingsTitle">${this.name} Settings</h2>
+        `;
+        for (const property in this.settings) {
+            html += this.settingConfigs[property]?.html(this.settings) ?? defaultSettingConfig(property).html(this.settings);
         }
-        html += `<button onclick="applyAndCloseSettings('${this.id()}');">Apply</button>`;
+        html += `
+                <div class="settingActions">
+                    <button class="settingsApplyBtn" onclick="applyAndCloseSettings('${this.id()}');">Apply</button>
+                </div>
+            </div>
+        `;
         return html;
     }
 }
@@ -171,7 +316,7 @@ function productId(prod) {
  * @param {Product} prod 
  */
 function productSearchString(prod) {
-    return `${prod.n} ${prod.c} ${prod.sn}`.toLowerCase();
+    return `${prod.n} ${prod.c}`.toLowerCase();
 }
 
 /**

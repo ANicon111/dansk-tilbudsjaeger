@@ -34,6 +34,7 @@ const keywords = {
     "egelykke": new Keyword("dairy", 200, "g"),
     "entrecote": new Keyword("meat", 1, "kg"),
     "falafel": new Keyword("semiprepared", 200, "g"),
+    "figner": new Keyword("fruitsandvegetables", 100, "g"),
     "fiskefilet": new Keyword("fish", 500, "g"),
     "gammeldansk": new Keyword("drinks", 700, "ml"),
     "gin": new Keyword("drinks", 700, "ml", false),
