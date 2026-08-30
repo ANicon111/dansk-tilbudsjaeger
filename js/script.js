@@ -73,7 +73,7 @@ function categoryHtml(brandId, category) {
         }
         return `
             <div class="cat" id="${categoryId(brandId, category)}">
-                <div class="catHeader" onclick="expandCategory('${categoryId(brandId, category)}');"><div class="catArrow"></div><span class="catTitle">${category}</span></div>
+                <div class="catHeader" onclick="expandCategory('${categoryId(brandId, category)}');"><div class="catArrow"></div><span class="catTitle">${lang.categories[category]}</span></div>
                 <div class="catList">
                     ${productsHtml}
                 </div>  

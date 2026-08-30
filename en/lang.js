@@ -38,5 +38,18 @@ const lang = {
             return `Found ${promotionCount} promotions for ${brandCount} brands` + (storeCount > 0 ? ` in ${storeCount} stores.` : '.');
         },
         noPromotions: "Couldn't find any promotions.",
+    },
+
+    categories: {
+        "fruitsandvegetables": "Fruits & Vegetables",
+        "meat": "Meat & Fish",
+        "dairy": "Dairy",
+        "eggs": "Eggs",
+        "drinks": "Drinks",
+        "bread": "Bread",
+        "cupboard": "Cupboard",
+        "semiprepared": "Semi-prepared",
+        "dessert": "Dessert",
+        "misc": "Others",
     }
 }

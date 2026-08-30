@@ -1,31 +1,4 @@
 /**
- * @param {string} url 
- * @param {string | null} errorMessage 
- * @returns {* | null}
- */
-async function lidlGet(url, errorMessage) {
-    try {
-        //TODO replace 3rd party dependency
-        const response = await fetch(`https://corsproxy.io/?key=2bef9221&url=${encodeURIComponent(url)}`, {
-            method: "GET",
-            headers: {
-                "Accept-Encoding": "text/json",
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        return (await response.json());
-    } catch (e) {
-        console.log(e);
-        // if (errorMessage!=null) addError(errorMessage); TODO error message support
-        return null;
-    }
-}
-
-/**
  * Parses a Lidl date string: "23.08. - 29.08.", "28.08." and "fra 27.08."
  * Handles year transitions (e.g., December offers spanning into January).
  * 
@@ -103,28 +76,26 @@ class Lidl extends Brand {
                 return true;
             }
         );
-
-        this.settings.updatePeriodMinutes = 1440; //TODO default daily updates until I remove cors proxy
     }
 
     async fetch() {
         try {
-            const leafletOrder = await lidlGet('https://digital-leaflet.lidlplus.com/api/v1/DK/campaignGroups', lang.errors.failedLeaflet(this.name));
-            for (const week of leafletOrder.groups) {
-                const promotionPromises = [];
+            const data = await genericGet('https://raw.githubusercontent.com/ANicon111/lidl-json/data/data.json', {}, lang.errors.failedLeaflet(this.name));
+
+            for (const week of data.campaignGroups.groups) {
+                const campaigns = [];
                 for (const campaign of week.campaigns)
                     if (!this.settings.promotionCategoryBlacklist.some(blacklisted => campaign.title.toLowerCase().includes(blacklisted.toLowerCase())))
-                        promotionPromises.push(lidlGet(`https://digital-leaflet.lidlplus.com/api/v1/DK/campaigns/${campaign.id}`, lang.errors.failedLeaflet(this.name)));
+                        if (data.campaigns[campaign.id])
+                            campaigns.push(data.campaigns[campaign.id]);
 
-                for (const promotionPromise of promotionPromises) {
-                    const promotions = await promotionPromise;
-
-                    for (const promotion of promotions.products) {
+                for (const campaign of campaigns) {
+                    for (const promotion of campaign.products) {
                         if (promotion.isOnline) continue; // skip the lidl online products
                         let prod = new Product();
                         prod.n = promotion.title;
                         prod.b = this.id();
-                        prod.c = promotions.title;
+                        prod.c = campaign.title;
 
                         prod.i = promotion.imageUrl;
                         prod.zi = promotion.imageUrl;
