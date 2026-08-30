@@ -39,7 +39,7 @@ function productHtml(id) {
     return `
         <div class="prod" id="${id}" data-value="${prod.v}">
             <div class="prodImage" style="${brandBackground(getBrandById(prod.b))}" onclick="zoomImage('${id}')"${prod.i == null ? ` disabled="true"` : ''}>
-                <img class="prodImageImage" ${imageCrop(prod.ic)} src="${prod.i ?? assets.placeholderProduct}" onerror="onErrorImage('${id}');">
+                <img class="prodImageImage" ${imageCrop(prod.ic)} src="${prod.i ?? assets.placeholderProduct}" loading="lazy" onerror="onErrorImage('${id}');">
             </div>
             <div class="prodText">
                 <h2 class="prodName">${prod.n}</h2>

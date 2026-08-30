@@ -120,7 +120,6 @@ class Lidl extends Brand {
                     const promotions = await promotionPromise;
 
                     for (const promotion of promotions.products) {
-                        console.log(promotion);
                         if (promotion.isOnline) continue; // skip the lidl online products
                         let prod = new Product();
                         prod.n = promotion.title;
