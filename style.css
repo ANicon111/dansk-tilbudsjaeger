@@ -35,6 +35,7 @@ body {
 }
 
 #frame {
+    position: relative;
     overflow: hidden;
     overscroll-behavior: none;
 }
@@ -82,8 +83,9 @@ body {
 }
 
 .brand {
+    position: absolute;
+    visibility: hidden;
     overscroll-behavior: none;
-    display: none;
     width: calc(100% - 1rem);
     height: calc(100% - 1rem);
     overflow: scroll;

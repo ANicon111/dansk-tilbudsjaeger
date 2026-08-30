@@ -137,7 +137,6 @@ async function loadBrand(brand) {
         }
     }
     if (brandList.innerHTML == "") brandList.innerHTML = "Nothing found";
-    if (previousSelectedBrand == brand.id()) updateCategoryDimensions();
 }
 
 let previousExpandedId = null;
@@ -187,14 +186,13 @@ function selectBrand(id) {
             });
             return;
         }
-        document.getElementById(previousSelectedBrand).style.display = null;
+        document.getElementById(previousSelectedBrand).style.visibility = null;
         document.getElementById(`${previousSelectedBrand}-button`).style.color = null;
         document.getElementById(`${previousSelectedBrand}-button`).style.backgroundColor = null;
     }
     const brand = getBrandById(id);
     document.getElementById(`${id}-button`).style = brandBackground(brand);
-    document.getElementById(id).style.display = "block";
-    updateCategoryDimensions();
+    document.getElementById(id).style.visibility = "visible";
     previousSelectedBrand = id;
     localStorage.setItem("selected-brand", previousSelectedBrand);
 }
@@ -308,15 +306,21 @@ async function main() {
         const brand = keyVal[1];
         brand.load();
         frame.innerHTML += `
-            <div id="${brand.id()}" class="brand" style="border-color:rgb(${brand.accentColor[0]}, ${brand.accentColor[1]}, ${brand.accentColor[2]});">
-                ${loadingBrandHtml(brand)}
-            </div>
+        <div id="${brand.id()}" class="brand" style="border-color:rgb(${brand.accentColor[0]}, ${brand.accentColor[1]}, ${brand.accentColor[2]});">
+        ${loadingBrandHtml(brand)}
+        </div>
         `;
         brandSelector.innerHTML += `<span class="brandButton" id="${brand.id()}-button" onclick="selectBrand('${brand.id()}')">${brand.shorthand}</span>`
-        loadPromises.push(loadBrand(brand));
     }
     selectBrand(localStorage.getItem("selected-brand") ?? supportedBrands.entries().next().value[0]);
+
     emptyCallbackQueue();
-    await loadPromises[0];
+    products = JSON.parse(localStorage.getItem("products")) ?? {};
+    productIdsByBrandAndCategory = JSON.parse(localStorage.getItem("productIds")) ?? {}
+    for (const keyVal of supportedBrands) {
+        loadPromises.push(loadBrand(keyVal[1]));
+    }
     await Promise.all(loadPromises);
+    updateCategoryDimensions();
 }
+main();

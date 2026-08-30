@@ -298,12 +298,12 @@ class Product {
 /**
  * @type {{string:{string:string[]}}}
  */
-const productIdsByBrandAndCategory = JSON.parse(localStorage.getItem("productIds")) ?? {};
+let productIdsByBrandAndCategory = {};
 
 /**
  * @type {{string:Product}}
  */
-const products = JSON.parse(localStorage.getItem("products")) ?? {};
+let products = {};
 
 /**
  * @param {Product} prod 
