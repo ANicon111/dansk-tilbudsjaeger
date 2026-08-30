@@ -323,4 +323,5 @@ async function main() {
     await Promise.all(loadPromises);
     updateCategoryDimensions();
 }
-main();
+
+onload = main;
