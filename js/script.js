@@ -62,9 +62,8 @@ function productHtml(id) {
  * @param {string} category 
  */
 function categoryHtml(brandId, category) {
-    const brandKeywords = getBrandById(brandId).settings.productKeywords;
     let idList = productIdsByBrandAndCategory[brandId]?.[category];
-    if (brandKeywords != null && brandKeywords.length > 0) idList = idList?.filter(id => brandKeywords.some(keyword => productSearchString(products[id] ?? "").includes(keyword.toLowerCase())));
+    if (globalProductFilter != null && globalProductFilter.length > 0) idList = idList?.filter(id => globalProductFilter.some(keyword => productSearchString(products[id] ?? "").includes(keyword.toLowerCase())));
     idList?.sort((a, b) => products[b].v - products[a].v);
     if (idList != null && idList.length > 0) {
         let productsHtml = "";
@@ -101,6 +100,11 @@ function loadingBrandHtml(brand) {
     const brandId = brand.id();
     return `
             <div class="brandTitle" style="${brandBackground(brand)}">${brand.name}<img class="settingsButton" ${(brand.accentColor[0] + brand.accentColor[1] + brand.accentColor[2]) / 3 > 127 ? `style="filter: invert();"` : ''} src="../assets/configure.webp" onclick="openSettings('${brand.id()}')"></div>
+            <div class="filter">
+                <label>Product Keywords (comma-separated)</label>
+                <input id="${brandId}-filter" class="globalProductFilter" type="text" value="${(globalProductFilter || []).join(', ')}" placeholder="e.g. milk, butter, coffee">
+                <button class="filterButton" style="${brandBackground(brand)}" onclick="applyProductFilter('${brandId}');">Apply</button>
+            </div>
             ${loyaltyHtml != null ? `<div class="brandLoyalty">${loyaltyHtml}</div>` : ''}
             <div id="${brand.id()}-list" class="brandList">${brand.settings.enabled ? "Loading..." : "Disabled"}</div>
         `;
@@ -172,13 +176,13 @@ function updateCategoryDimensions() {
 }
 addEventListener("resize", (e) => { updateCategoryDimensions(); })
 
-let previousSelectedBrand = null;
+let selectedBrand = null;
 /**
  * @param {string} id 
  */
 function selectBrand(id) {
-    if (previousSelectedBrand != null) {
-        if (id == previousSelectedBrand) {
+    if (selectedBrand != null) {
+        if (id == selectedBrand) {
             const brandElem = document.getElementById(id);
             brandElem.scroll({
                 top: 0,
@@ -186,15 +190,15 @@ function selectBrand(id) {
             });
             return;
         }
-        document.getElementById(previousSelectedBrand).style.visibility = null;
-        document.getElementById(`${previousSelectedBrand}-button`).style.color = null;
-        document.getElementById(`${previousSelectedBrand}-button`).style.backgroundColor = null;
+        document.getElementById(selectedBrand).style.visibility = null;
+        document.getElementById(`${selectedBrand}-button`).style.color = null;
+        document.getElementById(`${selectedBrand}-button`).style.backgroundColor = null;
     }
     const brand = getBrandById(id);
     document.getElementById(`${id}-button`).style = brandBackground(brand);
     document.getElementById(id).style.visibility = "visible";
-    previousSelectedBrand = id;
-    localStorage.setItem("selected-brand", previousSelectedBrand);
+    selectedBrand = id;
+    localStorage.setItem("selected-brand", selectedBrand);
 }
 
 /**
@@ -287,6 +291,23 @@ async function genericGet(url, headers, errorMessage) {
         // if (errorMessage!=null) addError(errorMessage); TODO error message support
         return null;
     }
+}
+
+let globalProductFilter = [];
+/**
+ * @param {string} brandId 
+ */
+async function applyProductFilter(brandId) {
+    globalProductFilter = document.getElementById(`${brandId}-filter`).value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+
+    for (const element of document.getElementsByClassName("globalProductFilter"))
+        element.value = globalProductFilter.join(", ");
+
+    const loadPromises = [];
+    for (const brand of supportedBrands)
+        loadPromises.push(loadBrand(brand[1]));
+    await Promise.all(loadPromises);
+    updateCategoryDimensions();
 }
 
 let postRenderCallbacks = [];

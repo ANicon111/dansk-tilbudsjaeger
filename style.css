@@ -216,6 +216,36 @@ body {
     text-align: center;
 }
 
+.filter {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-family: system-ui, sans-serif;
+}
+
+.filter label {
+    font-size: 1.5rem;
+}
+
+.globalProductFilter {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--font-strong);
+    border-radius: 4px;
+}
+
+.filterButton {
+    padding: 0.5rem 1rem;
+    color: var(--font-strong);
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.filterButton:hover {
+    opacity: 0.85;
+}
+
 .settingRow {
     display: flex;
     flex-direction: column;

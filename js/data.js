@@ -66,7 +66,6 @@ class Brand {
     settings = {
         enabled: true,
         loyaltyCode: null,
-        productKeywords: [],
         updatePeriodMinutes: 120, //Should be a sane default for leaflet-only stores
         ignoreThreshold: 200,
     };
@@ -102,20 +101,6 @@ class Brand {
             (settings) => {
                 const code = document.getElementsByClassName("setting-loyaltyCode")[0].value.trim();
                 settings.loyaltyCode = code.length > 0 ? code : null;
-                return true;
-            }
-        ),
-        productKeywords: new SettingConfig(
-            (settings) => {
-                return `
-                    <div class="settingRow">
-                        <label>Product Keywords (comma-separated)</label>
-                        <input class="setting-productKeywords" type="text" value="${(settings.productKeywords || []).join(', ')}" placeholder="e.g. milk, butter, coffee">
-                    </div>
-                `;
-            },
-            (settings) => {
-                this.settings.productKeywords = document.getElementsByClassName("setting-productKeywords")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
                 return true;
             }
         ),
