@@ -2,8 +2,8 @@ class Rema extends Brand {
     constructor() {
         super();
         this.name = "Rema 1000";
-        this.shorthand = this.name;
-        this.accentColor = [0, 83, 158]; // Rema 1000 primary blue
+        this.shorthand = "Rema";
+        this.accentColor = [22, 54, 96];
         delete this.settings.loyaltyCode;
     }
 
