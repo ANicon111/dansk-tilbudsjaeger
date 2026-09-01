@@ -28,6 +28,7 @@ const keywords = {
     "tuborg": new Keyword("drinks", 330, "ml"),
 
     // Specific Modifiers
+    "brus": new Keyword("drink", 1, "l"),
     "is": new Keyword("dessert", 330, "ml", false),
     "postej": new Keyword("semiprepared", 400, "g"),
     "sauce": new Keyword("cupboard", 400, "g"),

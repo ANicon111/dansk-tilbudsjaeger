@@ -331,31 +331,39 @@ function productSetCategory(prod) {
     switch (prod.c) { //TODO
         case "fruitsandvegetables":
         case "Frugt og Grønt - Dyrk Prisen!":
+        case "Frugt & grønt":
             prod.c = "fruitsandvegetables";
             break;
         case "meat":
         case "Kød & fisk":
         case "Ugens kød og fisk":
+        case "Kød, fisk & fjerkræ":
+        case "Køl":
             prod.c = "meat";
             break;
         case "dairy":
         case "Mejeri & køl":
+        case "Ost m.v.":
             prod.c = "dairy";
             break;
         case "eggs":
             prod.c = "eggs";
             break;
         case "drinks":
+        case "Drikkevarer":
             prod.c = "drinks";
             break;
         case "bread":
         case "Brød & kager":
+        case "Brød & Bavinchi":
             prod.c = "bread";
             break;
         case "cupboard":
+        case "Kolonial":
             prod.c = "cupboard";
             break;
         case "semiprepared":
+        case "Nemt & hurtigt":
             prod.c = "semiprepared";
             break;
         case "dessert":
@@ -390,7 +398,11 @@ function productSetUnit(prod) {
     switch (prod.u) {
         case "pcs":
         case "Stk.":
+        case "stk":
             prod.u = "piece"
+            break;
+        case "ltr":
+            prod.u = "l";
             break;
     }
 
