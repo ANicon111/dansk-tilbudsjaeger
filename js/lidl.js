@@ -92,7 +92,7 @@ class Lidl extends Brand {
                 for (const campaign of campaigns) {
                     for (const promotion of campaign.products) {
                         if (promotion.isOnline) continue; // skip the lidl online products
-                        let prod = new Product();
+                        const prod = new Product();
                         prod.n = promotion.title;
                         prod.b = this.id();
                         prod.c = campaign.title;
@@ -109,27 +109,42 @@ class Lidl extends Brand {
                         prod.op = promotion.mainPrice?.oldPrice != null ? promotion.mainPrice.oldPrice.toFixed(2) : null;
 
                         // Parse "15 x 300 ml | Pr. l 10,00"
-                        const parts = promotion.additionalInfo.split('|')[0].split('x');
+                        // Parse "350 g | Pr. kg 71,43"
+                        // Parse "Stk. | Pr. stk. 1,00"
+                        // Parse "5/Stk. | Pr. stk. 2,40"
+                        // Parse "20 Stk. | Pr. stk. 0,25"
+                        // Regex breakdown:
+                        // ^(?:(\d+)\s*[\/x]\s*)?  --> Optional multiplier prefix: "15 x " or "5/"
+                        // (?:(\d+)\s+)?           --> Optional quantity before unit: "20 "
+                        // ([a-zA-ZæøåÆØÅ]+)?      --> Optional unit: "ml", "g", "Stk."
+                        const regex = /^(?:([\d.,]+)\s*[\/x]\s*)?(?:([\d.,]+)\s+)?([a-zA-ZæøåÆØÅ.]+)?$/i;
+                        const match = promotion.additionalInfo.split('|')[0].trim().match(regex);
 
-                        if (parts.length >= 2) {
-                            const count = parts[0].trim();
-                            const sizeAndUnit = parts[1].trim().split(' ');
-                            const size = parseFloat(count.replace(",", ".")) * parseFloat(sizeAndUnit[0].replace(",", "."));
-                            if (!isNaN(size)) {
-                                prod.ls = size;
-                                prod.u = sizeAndUnit[1];
+                        if (match) {
+                            const multiplier = match[1] ? parseFloat(match[1].replace(',', '.')) : null;
+                            const value = match[2] ? parseFloat(match[2].replace(',', '.')) : null;
+                            const unit = match[3] || null;
+
+                            let size = null;
+
+                            if (multiplier !== null && value !== null) {
+                                // Case: "15 x 300 ml" -> 15 * 300 = 4500
+                                size = multiplier * value;
+                            } else if (multiplier !== null && value === null) {
+                                // Case: "5/Stk." -> 5
+                                size = multiplier;
+                            } else if (value !== null) {
+                                // Case: "350 g" or "20 Stk." -> 350 or 20
+                                size = value;
+                            } else {
+                                // Case: "Stk." -> 1
+                                size = 1;
                             }
-                        } else {
-                            const sizeAndUnit = parts[0].trim().split(' ');
-                            const size = parseFloat(sizeAndUnit[0].replace(",", "."));
-                            if (!isNaN(size)) {
-                                prod.ls = size;
-                                prod.u = sizeAndUnit[1];
-                            }
+                            prod.ls = size;
+                            prod.u = unit;
                         }
 
-                        prod = productSetValue(productSetCategory(productSetUnit(prod)));
-                        addProduct(prod);
+                        addProduct(productSetValue(productSetCategory(productSetUnit(prod))));
                     }
                 }
             }

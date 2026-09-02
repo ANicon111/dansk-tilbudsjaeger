@@ -188,7 +188,6 @@ class Brand {
     setSettings() {
         let success = true;
         for (const property in this.settings) {
-            console.log(`setting-${property}`);
             document.getElementsByClassName(`setting-${property}`)[0].style.backgroundColor = null;
             if (!(this.settingConfigs[property]?.parseAndStore(this.settings) ?? defaultSettingConfig(property).parseAndStore(this.settings))) {
                 document.getElementsByClassName(`setting-${property}`)[0].style.backgroundColor = "rgb(160,40,40)";
@@ -301,7 +300,7 @@ function productId(prod) {
  * @param {Product} prod 
  */
 function productSearchString(prod) {
-    return `${prod.n} ${prod.c}`.toLowerCase();
+    return `${prod.n}`.toLowerCase();
 }
 
 /**

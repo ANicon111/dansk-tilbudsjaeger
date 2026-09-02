@@ -187,6 +187,11 @@ body {
 }
 
 
+.coopBarcode {
+    width: min(100%, 25rem);
+    height: auto;
+}
+
 .sallingBarcode {
     width: min(100%, 25rem);
     height: auto;

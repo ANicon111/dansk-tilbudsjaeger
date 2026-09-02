@@ -195,6 +195,14 @@ function selectBrand(id) {
         document.getElementById(`${selectedBrand}-button`).style.backgroundColor = null;
     }
     const brand = getBrandById(id);
+    const currentTimeMinusUpdatePeriod = new Date();
+    currentTimeMinusUpdatePeriod.setMinutes(currentTimeMinusUpdatePeriod.getMinutes() - brand.settings.updatePeriodMinutes);
+    const lastUpdate = JSON.parse(localStorage.getItem(id));
+    if (brand.forceNextReload || currentTimeMinusUpdatePeriod < lastUpdate) {
+        document.getElementById(id).innerHTML = loadingBrandHtml(brand);
+        loadBrand(brand);
+    }
+
     document.getElementById(`${id}-button`).style = brandBackground(brand);
     document.getElementById(id).style.visibility = "visible";
     selectedBrand = id;
@@ -238,6 +246,7 @@ function applyAndCloseSettings(brandId) {
         loadBrand(brand);
         document.getElementById("brandSettings").style.display = null;
         emptyCallbackQueue();
+        updateCategoryDimensions();
     }
 }
 

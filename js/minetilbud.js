@@ -1,1 +1,0 @@
-//TODO remove stores once I actually implement them. Sorry to the scrapers at minetilbud.dk, but I'm scraping you... maybe
