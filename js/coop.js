@@ -180,6 +180,6 @@ class Coop extends Brand {
 }
 
 //TODO fix colors
-addBrand(new Coop("Brugsen", "Brug", "brugsen", [255, 0, 0], []));
-addBrand(new Coop("SuperBrugsen & Kvickly", "SB&K", "superbrugsen", [255, 0, 0], []));
-addBrand(new Coop("365 discount", "365", "discount", [0, 255, 0], []));
+addBrand(new Coop("Brugsen", "Brug", "brugsen", [195, 20, 20], []));
+addBrand(new Coop("SuperBrugsen & Kvickly", "SB&K", "superbrugsen", [195, 20, 20], []));
+addBrand(new Coop("365 discount", "365", "discount", [0, 170, 70], []));
