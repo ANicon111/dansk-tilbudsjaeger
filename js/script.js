@@ -200,7 +200,7 @@ function selectBrand(id) {
     const lastUpdate = JSON.parse(localStorage.getItem(id));
     if (brand.forceNextReload || currentTimeMinusUpdatePeriod < lastUpdate) {
         document.getElementById(id).innerHTML = loadingBrandHtml(brand);
-        loadBrand(brand);
+        loadBrand(brand).then(updateCategoryDimensions);
     }
 
     document.getElementById(`${id}-button`).style = brandBackground(brand);
@@ -239,12 +239,12 @@ function openSettings(brandId) {
 /**
  * @param {string} brandId 
  */
-function applyAndCloseSettings(brandId) {
+async function applyAndCloseSettings(brandId) {
     const brand = getBrandById(brandId);
     if (brand.setSettings()) {
         document.getElementById(brandId).innerHTML = loadingBrandHtml(brand);
-        loadBrand(brand);
         document.getElementById("brandSettings").style.display = null;
+        await loadBrand(brand);
         emptyCallbackQueue();
         updateCategoryDimensions();
     }
