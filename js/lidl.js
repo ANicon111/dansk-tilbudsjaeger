@@ -80,7 +80,7 @@ class Lidl extends Brand {
 
     async fetch() {
         try {
-            const data = await genericGet('https://raw.githubusercontent.com/ANicon111/lidl-json/data/data.json', {}, lang.errors.failedLeaflet(this.name));
+            const data = await genericGet('https://raw.githubusercontent.com/ANicon111/lidl-json/data/data.json', {}, this.id(), lang.errors.failedLeaflet(this.name));
 
             for (const week of data.campaignGroups.groups) {
                 const campaigns = [];
@@ -150,7 +150,7 @@ class Lidl extends Brand {
             }
         } catch (e) {
             console.log(e);
-            // addError(lang.errors.failedLeaflet(this.name)); TODO
+            addWarning(this.id(), lang.invalidLoyaltyCode);
         }
     }
 

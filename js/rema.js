@@ -9,8 +9,7 @@ class Rema extends Brand {
 
     async fetch() {
         try {
-            const url = 'https://raw.githubusercontent.com/ANicon111/rema-json/data/data.json';
-            const response = await genericGet(url, {}, lang.errors.failedLeaflet(this.name));
+            const response = await genericGet('https://raw.githubusercontent.com/ANicon111/rema-json/data/data.json', {}, this.id(), lang.errors.failedLeaflet(this.name));
 
             const items = response?.data ?? [];
 
@@ -59,7 +58,7 @@ class Rema extends Brand {
             }
         } catch (e) {
             console.log(e);
-            // addError(lang.errors.failedLeaflet(this.name));
+            addError(this.id(), lang.errors.failedLeaflet(this.name));
         }
     }
 }

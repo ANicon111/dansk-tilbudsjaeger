@@ -2,14 +2,16 @@
  * 
  * @param {string} url 
  * @param {string | null} errorMessage 
+ * @param {string | null} brandId 
  * @returns {* | null}
  */
-function sallingGet(url, errorMessage) {
+function sallingGet(url, brandId, errorMessage) {
     return genericGet(
         url,
         {
             "Accept-Encoding": "text/json",
         },
+        brandId,
         errorMessage
     );
 }
@@ -18,15 +20,17 @@ function sallingGet(url, errorMessage) {
  * @param {string} url 
  * @param {string} tenantAlias 
  * @param {string | null} errorMessage 
+ * @param {string | null} brandId 
  * @returns {* | null}
  */
-function sallingTenantGet(url, tenantAlias, errorMessage) {
+function sallingTenantGet(url, tenantAlias, brandId, errorMessage) {
     return genericGet(
         url,
         {
             "Accept-Encoding": "text/json",
             "X-tenantAlias": tenantAlias,
         },
+        brandId,
         errorMessage
     );
 }
@@ -168,13 +172,13 @@ class Salling extends Brand {
 
     async fetchLeaflet() {
         try {
-            const leafletsOrder = await sallingTenantGet('https://p-club.dsgapps.dk/api/cp/leafletsOrder', this.tenantAlias, lang.errors.failedLeaflet(this.name));
+            const leafletsOrder = await sallingTenantGet('https://p-club.dsgapps.dk/api/cp/leafletsOrder', this.tenantAlias, this.id(), lang.errors.failedLeaflet(this.name));
             const leafletPromises = [];
             for (const leaflet of leafletsOrder.leafletIds) {
                 leafletPromises.push({
-                    info: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, lang.errors.failedLeaflet(this.name)),
-                    pages: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, lang.errors.failedLeaflet(this.name)),
-                    promotions: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, lang.errors.failedLeaflet(this.name)),
+                    info: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, this.id(), lang.errors.failedLeaflet(this.name)),
+                    pages: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, this.id(), lang.errors.failedLeaflet(this.name)),
+                    promotions: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, this.id(), lang.errors.failedLeaflet(this.name)),
                 });
 
             }
@@ -231,7 +235,7 @@ class Salling extends Brand {
             }
         } catch (e) {
             console.log(e);
-            // addError(lang.errors.failedLeaflet(this.name)); TODO
+            addError(this.id(), lang.errors.failedLeaflet(this.name));
         }
     }
 
@@ -240,7 +244,7 @@ class Salling extends Brand {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         if (this.stored.storesLastUpdate == null || this.stored.storesLastUpdate < yesterday.toISOString()) {
-            this.stored.stores = await sallingTenantGet("https://p-club.dsgapps.dk/api/cp/stores", this.tenantAlias, lang.errors.failedStoreList(this.name));
+            this.stored.stores = await sallingTenantGet("https://p-club.dsgapps.dk/api/cp/stores", this.tenantAlias, this.id(), lang.errors.failedStoreList(this.name));
             this.stored.storesLastUpdate = (new Date()).toISOString();
         }
         this.store();
@@ -261,7 +265,7 @@ class Salling extends Brand {
 
         const storePromises = [];
         for (const store of filteredStores)
-            storePromises.push(sallingTenantGet(`https://p-club.dsgapps.dk/api/cp/lpr/clearanceItems?id=${store.id}`, this.tenantAlias, lang.errors.failedLocal(store.name, store.address.city)));
+            storePromises.push(sallingTenantGet(`https://p-club.dsgapps.dk/api/cp/lpr/clearanceItems?id=${store.id}`, this.tenantAlias, this.id(), lang.errors.failedLocal(store.name, store.address.city)));
 
         for (const storePromise of storePromises) {
             try {
@@ -289,7 +293,7 @@ class Salling extends Brand {
                 }
             } catch (e) {
                 console.log(e);
-                // addError(lang.errors.failedLocal(store.name, store.address.city)); TODO
+                addError(this.id(), lang.errors.failedLocal(store.name, store.address.city));
             }
         }
     }
@@ -305,7 +309,7 @@ class Salling extends Brand {
                     });
                 } catch (error) {
                     document.getElementById(`${this.id()}-svg`).style.display = "none";
-                    //addError(error);
+                    addWarning(this.id(), lang.invalidLoyaltyCode);
                 }
             });
             return `<svg id="${this.id()}-svg" class="sallingBarcode"></svg>`;
@@ -313,7 +317,6 @@ class Salling extends Brand {
     }
 }
 
-//TODO fix colors
 addBrand(new Salling("Netto", "TID-2Y7JRG", [255, 212, 69], ["Nonfood"]));
 addBrand(new Salling("Bilka", "TID-BZ929S", [162, 215, 246], ["Have", "Trend", "Outdoor", "Prosonic"]));
 addBrand(new Salling("Føtex", "TID-F86K6Y", [0, 0, 55], ["Inspiration", "føtex ud af huset"]));

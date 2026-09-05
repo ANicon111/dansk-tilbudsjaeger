@@ -70,6 +70,7 @@ const lang = {
     enableStore: "Geschäft aktivieren",
     loyaltyCode: "Treuecode",
     enterLoyaltyCode: "Treuecode eingeben",
+    invalidLoyaltyCode: "Ungültiger treuecode",
     updatePeriod: "Aktualisierungsintervall (Minuten)",
     ignoreThreshold: "Toleranzgrenze ignorieren",
     applySettings: "Anwenden",

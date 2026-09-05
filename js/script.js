@@ -108,7 +108,7 @@ function loadingBrandHtml(brand) {
             </div>
             ${loyaltyHtml != null ? `<div class="brandLoyalty">${loyaltyHtml}</div>` : ''}
             <div id="${brand.id()}-messages" class="brandMessages"></div>
-            <div id="${brand.id()}-list" class="brandList">${brand.settings.enabled ? lang.loading : lang.disabled}</div>
+            <div id="${brand.id()}-list" class="brandList"><p class="brandLoading">${brand.settings.enabled ? lang.loading : lang.disabled}</p></div>
         `;
 }
 
@@ -298,10 +298,11 @@ function unitToSI(unit) {
  * 
  * @param {string} url 
  * @param {*} headers 
+ * @param {string | null} brandId 
  * @param {string | null} errorMessage 
  * @returns {* | null}
  */
-async function genericGet(url, headers, errorMessage) {
+async function genericGet(url, headers, brandId, errorMessage) {
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -315,7 +316,7 @@ async function genericGet(url, headers, errorMessage) {
         return (await response.json());
     } catch (e) {
         console.log(e);
-        // if (errorMessage!=null) addError(errorMessage); TODO error message support
+        if (brandId != null && errorMessage != null) addError(brandId, errorMessage);
         return null;
     }
 }

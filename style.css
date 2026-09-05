@@ -97,6 +97,35 @@ body {
     text-align: center;
 }
 
+.brandMessage {
+    border: 0.25rem solid var(--font-strong);
+    border-radius: 0.5rem;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.brandWarning {
+    border: 0.25rem solid yellow;
+    border-radius: 0.5rem;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.brandError {
+    border: 0.25rem solid red;
+    border-radius: 0.5rem;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.brandLoading {
+    text-align: center;
+    font-size: 2rem;
+}
+
 .brandTitle {
     text-align: center;
     font-size: 2rem;

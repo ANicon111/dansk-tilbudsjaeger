@@ -69,6 +69,7 @@ const lang = {
     },
     enableStore: "Activer le magasin",
     loyaltyCode: "Code de fidélité",
+    invalidLoyaltyCode: "Code de fidélité non valide",
     enterLoyaltyCode: "Entrer le code de fidélité",
     updatePeriod: "Période de mise à jour (minutes)",
     ignoreThreshold: "Ignorer le seuil",

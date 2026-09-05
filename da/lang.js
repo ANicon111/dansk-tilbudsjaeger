@@ -70,6 +70,7 @@ const lang = {
     enableStore: "Aktivér butik",
     loyaltyCode: "Loyalitetskode",
     enterLoyaltyCode: "Indtast loyalitetskode",
+    invalidLoyaltyCode: "Ugyldig loyalitetskode",
     updatePeriod: "Opdateringsinterval (minutter)",
     ignoreThreshold: "Ignorer grænseværdi",
     applySettings: "Anvend",

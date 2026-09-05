@@ -69,6 +69,7 @@ const lang = {
     },
     enableStore: "Activează magazinul",
     loyaltyCode: "Cod de fidelitate",
+    invalidLoyaltyCode: "Cod de fidelitate invalid",
     enterLoyaltyCode: "Introdu codul de fidelitate",
     updatePeriod: "Perioadă de actualizare (minute)",
     ignoreThreshold: "Ignoră pragul",

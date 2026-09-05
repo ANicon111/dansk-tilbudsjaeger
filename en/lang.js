@@ -69,6 +69,7 @@ const lang = {
     },
     enableStore: "Enable Store",
     loyaltyCode: "Loyalty Code",
+    invalidLoyaltyCode: "Invalid loyalty code",
     enterLoyaltyCode: "Enter loyalty code",
     updatePeriod: "Update Period (Minutes)",
     ignoreThreshold: "Ignore Threshold",

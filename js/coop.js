@@ -82,7 +82,7 @@ class Coop extends Brand {
 
     async fetch() {
         try {
-            const rawData = await genericGet('https://raw.githubusercontent.com/ANicon111/coop-json/data/data.json', {}, lang.errors.failedLeaflet(this.name));
+            const rawData = await genericGet('https://raw.githubusercontent.com/ANicon111/coop-json/data/data.json', {}, this.id(), lang.errors.failedLeaflet(this.name));
             const chainsOrder = rawData?.chains ?? [];
             const leafletsOrder = rawData?.catalogs ?? [];
             // 1. Find the target chain by matching the coop store name
@@ -99,9 +99,9 @@ class Coop extends Brand {
             const leafletPromises = [];
             for (const leaflet of filteredLeaflets) {
                 leafletPromises.push({
-                    info: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, lang.errors.failedLeaflet(this.name)),
-                    pages: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, lang.errors.failedLeaflet(this.name)),
-                    promotions: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, lang.errors.failedLeaflet(this.name)),
+                    info: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}`, this.id(), lang.errors.failedLeaflet(this.name)),
+                    pages: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/pages`, this.id(), lang.errors.failedLeaflet(this.name)),
+                    promotions: sallingGet(`https://squid-api.tjek.com/v2/catalogs/${leaflet}/hotspots`, this.id(), lang.errors.failedLeaflet(this.name)),
                 });
             }
 
@@ -132,7 +132,7 @@ class Coop extends Brand {
                     let prod = new Product();
                     prod.n = promotion.offer.heading;
                     prod.b = this.id();
-                    prod.c = null; //TODO maybe get some category info somehow
+                    prod.c = null;
 
                     prod.i = this.settings.dataSaver ? leafletPages[Object.keys(promotion.locations)[0] - 1]?.thumb : leafletPages[Object.keys(promotion.locations)[0] - 1]?.view;
                     prod.ic = [width, height, top, right, bottom, left];
@@ -171,7 +171,7 @@ class Coop extends Brand {
                 } catch (error) {
                     console.log(error);
                     document.getElementById(`${this.id()}-svg`).style.display = "none";
-                    //addError(error);
+                    addWarning(this.id(), lang.invalidLoyaltyCode);
                 }
             });
             return `<svg id="${this.id()}-svg" class="coopBarcode"></svg>`;
@@ -179,7 +179,6 @@ class Coop extends Brand {
     }
 }
 
-//TODO fix colors
 addBrand(new Coop("Brugsen", "Brug", "brugsen", [195, 20, 20], []));
 addBrand(new Coop("SuperBrugsen & Kvickly", "SB&K", "superbrugsen", [195, 20, 20], []));
 addBrand(new Coop("365 discount", "365", "discount", [0, 170, 70], []));
