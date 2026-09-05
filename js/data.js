@@ -39,7 +39,7 @@ function defaultSettingConfig(name) {
             return `
             <div class="settingRow">
                 <label>${this.name}</label>
-                <input class="setting-${this.name}" type="text" value="${JSON.stringify(settings[this.name]).replaceAll("\"", "&quot;")}" placeholder="Enter ${this.name}">
+                <input class="setting-${this.name}" type="text" value="${JSON.stringify(settings[this.name]).replaceAll("\"", "&quot;")}" placeholder="${lang.enterSetting(this.name)}">
             </div>
         `;
         },
@@ -79,7 +79,7 @@ class Brand {
                     <div class="settingRow checkboxRow">
                         <label class="settingLabelCheckbox">
                             <input class="setting-enabled" type="checkbox" ${settings.enabled ? 'checked' : ''}>
-                            <span>Enable Store</span>
+                            <span>${lang.enableStore}</span>
                         </label>
                     </div>
                 `;
@@ -93,8 +93,8 @@ class Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Loyalty Code</label>
-                        <input class="setting-loyaltyCode" type="text" value="${settings.loyaltyCode ?? ''}" placeholder="Enter loyalty code">
+                        <label>${lang.loyaltyCode}</label>
+                        <input class="setting-loyaltyCode" type="text" value="${settings.loyaltyCode ?? ''}" placeholder="${lang.enterLoyaltyCode}">
                     </div>
                 `;
             },
@@ -108,7 +108,7 @@ class Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Update Period (Minutes)</label>
+                        <label>${lang.updatePeriod}</label>
                         <input class="setting-updatePeriodMinutes" type="number" min="1" value="${settings.updatePeriodMinutes}">
                     </div>
                 `;
@@ -127,7 +127,7 @@ class Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Ignore Threshold</label>
+                        <label>${lang.ignoreThreshold}</label>
                         <input class="setting-ignoreThreshold" type="number" min="0" value="${settings.ignoreThreshold}">
                     </div>
                 `;
@@ -201,14 +201,14 @@ class Brand {
     settingsHtml() {
         let html = `
             <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
-                <h2 class="sallingSettingsTitle">${this.name} Settings</h2>
+                <h2 class="sallingSettingsTitle">${lang.settingsTitle(this.name)}</h2>
         `;
         for (const property in this.settings) {
             html += this.settingConfigs[property]?.html(this.settings) ?? defaultSettingConfig(property).html(this.settings);
         }
         html += `
                 <div class="settingActions">
-                    <button class="settingsApplyBtn" onclick="applyAndCloseSettings('${this.id()}');">Apply</button>
+                    <button class="settingsApplyBtn" onclick="applyAndCloseSettings('${this.id()}');">${lang.applySettings}</button>
                 </div>
             </div>
         `;

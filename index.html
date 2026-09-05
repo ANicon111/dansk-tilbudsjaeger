@@ -32,7 +32,7 @@
     <p><a href="da/index.html">dansk</a></p>
     <p><a href="ro/index.html">română</a></p>
     <p><a href="de/index.html">deutch</a></p>
-    <p><a href="de/index.html">français</a></p>
+    <p><a href="fr/index.html">français</a></p>
     <script>
         params = new URL(window.location.href).searchParams.toString();
         const userLang = localStorage.getItem("preferred-language") || navigator.language || navigator.userLanguage;
@@ -41,8 +41,16 @@
             case "da":
                 redirectLang = "da";
                 break;
+            case "de":
+                redirectLang = "de";
+                break;
+            case "ro":
+                redirectLang = "ro";
+                break;
+            case "fr":
+                redirectLang = "fr";
+                break;
         }
-        redirectLang = "en"; //TODO remove
         window.location.href = `${redirectLang}/index.html?${params}`;
     </script>
 </body>

@@ -86,8 +86,8 @@ class Salling extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Leaflet Blacklist (comma-separated)</label>
-                        <input class="setting-leafletBlacklist" type="text" value="${(settings.leafletBlacklist || []).join(', ')}" placeholder="e.g. nonfood, Prosonic">
+                        <label>${lang.leafletBlacklist}</label>
+                        <input class="setting-leafletBlacklist" type="text" value="${(settings.leafletBlacklist || []).join(', ')}" placeholder="${lang.leafletBlacklistPlaceholder}">
                     </div>
                 `;
             },
@@ -101,8 +101,8 @@ class Salling extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Enabled Store Names/Locations (comma-separated)</label>
-                        <input class="setting-enabledStoreList" type="text" value="${(settings.enabledStoreList || []).join(', ')}" placeholder="e.g. Sønderborg, Lufthavn">
+                        <label>${lang.enabledStores}</label>
+                        <input class="setting-enabledStoreList" type="text" value="${(settings.enabledStoreList || []).join(', ')}" placeholder="${lang.enabledStoresPlaceholder}">
                     </div>
                 `;
             },
@@ -120,7 +120,7 @@ class Salling extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Max Fetched Stores per Enabled Entry</label>
+                        <label>${lang.maxStoresPerEnabled}</label>
                         <input class="setting-maxStoresPerEnabled" type="number" min="1" value="${settings.maxStoresPerEnabled}">
                     </div>
                 `;
@@ -132,8 +132,9 @@ class Salling extends Brand {
                     this.settings.maxStoresPerEnabled = val;
                 } else {
                     setErr(document.getElementsByClassName("setting-maxStoresPerEnabled")[0]);
-                    success = false;
+                    return false;
                 }
+                return true;
             }
         );
         this.settings.dataSaver = false;
@@ -143,7 +144,7 @@ class Salling extends Brand {
                     <div class="settingRow checkboxRow">
                         <label class="settingLabelCheckbox">
                             <input class="setting-dataSaver" type="checkbox" ${settings.dataSaver ? 'checked' : ''}>
-                            <span>Data Saver Mode</span>
+                            <span>${lang.dataSaverMode}</span>
                         </label>
                     </div>
                 `;

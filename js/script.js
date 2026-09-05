@@ -36,6 +36,7 @@ function productHtml(id) {
     const available = prod.sd <= currentTime && currentTime <= (prod.ed ?? currentTime);
     const sizeGuess = prod.ls < 0;
     const endDate = prod.ed?.split("T")[0];
+    const startDate = prod.sd.split("T")[0];
     return `
         <div class="prod" id="${id}" data-value="${prod.v}">
             <div class="prodImage" style="${brandBackground(getBrandById(prod.b))}" onclick="zoomImage('${id}')"${prod.i == null ? ` disabled="true"` : ''}>
@@ -43,15 +44,15 @@ function productHtml(id) {
             </div>
             <div class="prodText">
                 <h2 class="prodName">${prod.n}</h2>
-                <span class="prodPrice">${prod.p} DKK</span>
-                ${prod.op ? `<small class="prodOldPrice">${prod.op} DKK</small>` : ''}
+                <span class="prodPrice">${prod.p} ${lang.dkk}</span>
+                ${prod.op ? `<small class="prodOldPrice">${prod.op} ${lang.dkk}</small>` : ''}
                 <br>
                 ${prod.sn ? `<p class="prodStore">${prod.sn}</p>` : ''}
                 <span class="prodSize">${sizeGuess ? `~ ${-prod.ls}` : prod.ls}${prod.us != null ? ` - ${prod.us}` : ''} ${prod.u}, </span>
-                <span class="prodPricePerUnit">${prod.lpu != prod.upu ? `${prod.lpu} - ` : ''}${prod.upu} DKK / ${unitToSI(prod.u)}</span>
+                <span class="prodPricePerUnit">${lang.pricePerUnit(prod.lpu, prod.upu, unitToSI(prod.u))}</span>
                 <br>
-                <p class="prodAvailability"${available ? '' : ' style="color: #888;font-style:italic;"'}>From ${prod.sd.split("T")[0]}${endDate ? ` to ${endDate}` : ''}</p>
-                ${prod.st ? `<p class="prodStock">${prod.st}+ in stock</p>` : ''}
+                <p class="prodAvailability"${available ? '' : ' style="color: #888;font-style:italic;"'}>${lang.availableFromTo(startDate, endDate)}</p>
+                ${prod.st ? `<p class="prodStock">${lang.stockCount(prod.st)}</p>` : ''}
             </div>
         </div>
     `;
@@ -101,12 +102,13 @@ function loadingBrandHtml(brand) {
     return `
             <div class="brandTitle" style="${brandBackground(brand)}">${brand.name}<img class="settingsButton" ${(brand.accentColor[0] + brand.accentColor[1] + brand.accentColor[2]) / 3 > 127 ? `style="filter: invert();"` : ''} src="../assets/configure.webp" onclick="openSettings('${brand.id()}')"></div>
             <div class="filter">
-                <label>Product Keywords (comma-separated)</label>
-                <input id="${brandId}-filter" class="globalProductFilter" type="text" value="${(globalProductFilter || []).join(', ')}" placeholder="e.g. milk, butter, coffee">
-                <button class="filterButton" style="${brandBackground(brand)}" onclick="applyProductFilter('${brandId}');">Apply</button>
+                <label>${lang.productKeywords}</label>
+                <input id="${brandId}-filter" class="globalProductFilter" type="text" value="${(globalProductFilter || []).join(', ')}" placeholder="${lang.keywordsPlaceholder}">
+                <button class="filterButton" style="${brandBackground(brand)}" onclick="applyProductFilter('${brandId}');">${lang.apply}</button>
             </div>
             ${loyaltyHtml != null ? `<div class="brandLoyalty">${loyaltyHtml}</div>` : ''}
-            <div id="${brand.id()}-list" class="brandList">${brand.settings.enabled ? "Loading..." : "Disabled"}</div>
+            <div id="${brand.id()}-messages" class="brandMessages"></div>
+            <div id="${brand.id()}-list" class="brandList">${brand.settings.enabled ? lang.loading : lang.disabled}</div>
         `;
 }
 
@@ -140,7 +142,7 @@ async function loadBrand(brand) {
             brandList.innerHTML += html;
         }
     }
-    if (brandList.innerHTML == "") brandList.innerHTML = "Nothing found";
+    if (brandList.innerHTML == "") brandList.innerHTML = lang.nothingFound;
 }
 
 let previousExpandedId = null;
@@ -224,6 +226,22 @@ function zoomImage(productId) {
 function closeZoomImage() {
     const zoom = document.getElementById("zoom");
     document.getElementById("zoom").style.display = null;
+}
+
+function addMessage(brandId, message) {
+    document.getElementById(`${brandId}-messages`).innerHTML += `<p class="brandMessage">🛈 ${message}</p>`;
+}
+
+function addWarning(brandId, warning) {
+    document.getElementById(`${brandId}-messages`).innerHTML += `<p class="brandWarning">‼ ${warning}</p>`;
+}
+
+function addError(brandId, error) {
+    document.getElementById(`${brandId}-messages`).innerHTML += `<p class="brandError">✘ ${error}</p>`;
+}
+
+function clearMessages(brandId) {
+    document.getElementById(`${brandId}-messages`).innerHTML = "";
 }
 
 /**

@@ -1,0 +1,13 @@
+{
+  "name": "Chasseur de Bons Plans Danois",
+  "start_url": "../",
+  "icons": [
+    {
+      "sizes": "512x512",
+      "src": "../assets/product.png",
+      "type": "image/png"
+    }
+  ],
+  "display": "fullscreen",
+  "handle_links": "preferred"
+}
