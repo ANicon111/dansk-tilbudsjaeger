@@ -211,6 +211,16 @@ function selectBrand(id) {
     localStorage.setItem("selected-brand", selectedBrand);
 }
 
+function selectNextBrand() {
+    const supportedBrandIds = [...supportedBrands.keys()];
+    selectBrand(supportedBrandIds[(supportedBrandIds.indexOf(selectedBrand) + 1) % supportedBrandIds.length])
+}
+
+function selectPreviousBrand() {
+    const supportedBrandIds = [...supportedBrands.keys()];
+    selectBrand(supportedBrandIds[(supportedBrandIds.length + supportedBrandIds.indexOf(selectedBrand) - 1) % supportedBrandIds.length])
+}
+
 /**
  * @param {string} productId 
  */
@@ -374,3 +384,31 @@ async function main() {
 }
 
 onload = main;
+
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case "ArrowLeft":
+            selectPreviousBrand()
+            break;
+        case "ArrowRight":
+            selectNextBrand()
+            break;
+    }
+});
+
+let touchstartX = 0
+let touchstartY = 0
+document.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+    touchstartY = e.changedTouches[0].screenY;
+})
+
+document.addEventListener('touchend', e => {
+    const deltaX = touchstartX - e.changedTouches[0].screenX;
+    const deltaY = touchstartY - e.changedTouches[0].screenY;
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > Math.min(screen.availWidth, screen.availHeight) / 3) {
+        if (deltaX > 0) selectNextBrand();
+        else selectPreviousBrand();
+    }
+    checkDirection();
+})
