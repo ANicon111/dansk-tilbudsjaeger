@@ -396,20 +396,28 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-let touchstartX = 0
-let touchstartY = 0
+let touchstartX = 0;
+let touchstartY = 0;
+let isMultiTouch = false;
 document.getElementById("frame").addEventListener('touchstart', e => {
-    if (e.changedTouches.length > 1) return;
+    if (e.changedTouches.length > 1) {
+        isMultiTouch = true;
+        return;
+    }
+
+    isMultiTouch = false;
     touchstartX = e.changedTouches[0].screenX;
     touchstartY = e.changedTouches[0].screenY;
-})
+});
 
 document.getElementById("frame").addEventListener('touchend', e => {
-    if (e.changedTouches.length > 1) return;
+    if (isMultiTouch || e.changedTouches.length > 1) return;
+
     const deltaX = touchstartX - e.changedTouches[0].screenX;
     const deltaY = touchstartY - e.changedTouches[0].screenY;
+
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > Math.min(screen.availWidth, screen.availHeight) / 3) {
         if (deltaX > 0) selectNextBrand();
         else selectPreviousBrand();
     }
-})
+});
