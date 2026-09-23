@@ -76,7 +76,7 @@ body {
 
 .brandButton {
     text-align: center;
-    font-size: 2rem;
+    font-size: 1.75rem;
     flex-grow: 1;
     padding: 0.5rem;
     background-color: var(--card);
@@ -146,7 +146,7 @@ body {
 }
 
 .catTitle {
-    font-size: 2rem;
+    font-size: 1.75rem;
 }
 
 .catList {

@@ -223,9 +223,9 @@ class Salling extends Brand {
                     prod.p = promotion.offer.pricing.price.toFixed(2);
                     prod.op = promotion.offer.pricing.pre_price?.toFixed(2);
 
-                    prod.ls = promotion.offer.quantity.size.from;
+                    prod.ls = promotion.offer.quantity.size.from * promotion.offer.quantity.pieces.from;
                     if (promotion.offer.quantity.size.to != promotion.offer.quantity.size.from)
-                        prod.us = promotion.offer.quantity.size.to;
+                        prod.us = promotion.offer.quantity.size.to * promotion.offer.quantity.pieces.to;
                     prod.u = promotion.offer.quantity.unit.symbol;
 
                     prod = productSetValue(productSetCategory(productSetUnit(prod)));
