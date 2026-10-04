@@ -103,10 +103,10 @@ function loadingBrandHtml(brand) {
     const invertFilter = isLightAccent ? 'style="filter: invert();"' : '';
     return `
             <div class="brandTitle" style="${brandBackground(brand)}">${brand.name}
-                <div style="float: right;">
-                    <img class="settingsButton" ${invertFilter} src="../assets/language.webp" title="${lang.selectLanguage}" onclick="openLanguageMenu()">
-                    <img class="settingsButton" ${invertFilter} src="../assets/help.webp" title="${lang.helpTitle(brand.name)}" onclick="openHelp('${brand.id()}')">
-                    <img class="settingsButton" ${invertFilter} src="../assets/configure.webp" title="${lang.settingsTitle(brand.name)}" onclick="openSettings('${brand.id()}')">
+                <div class="titleButtons">
+                    <img class="titleButton" ${invertFilter} src="../assets/language.webp" title="${lang.selectLanguage}" onclick="openLanguageMenu()">
+                    <img class="titleButton" ${invertFilter} src="../assets/help.webp" title="${lang.helpTitle(brand.name)}" onclick="openHelp('${brand.id()}')">
+                    <img class="titleButton" ${invertFilter} src="../assets/configure.webp" title="${lang.settingsTitle(brand.name)}" onclick="openSettings('${brand.id()}')">
                 </div>
             </div>
             <div class="filter">

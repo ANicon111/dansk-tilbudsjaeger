@@ -180,5 +180,5 @@ class Coop extends Brand {
 }
 
 addBrand(new Coop("Brugsen", "Brug", "brugsen", [195, 20, 20], []));
-addBrand(new Coop("SuperBrugsen & Kvickly", "SB&K", "superbrugsen", [195, 20, 20], []));
+addBrand(new Coop("SuperBrugsen &&nbspKvickly", "SB&K", "superbrugsen", [195, 20, 20], []));
 addBrand(new Coop("365 discount", "365", "discount", [0, 170, 70], []));

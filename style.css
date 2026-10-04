@@ -67,15 +67,6 @@ body {
     z-index: 100; /* Ensures menus stay on top */
 }
 
-/* Update this block in style.css to prevent icons overlapping */
-.settingsButton {
-    width: 2.5rem;
-    height: 2.5rem;
-    cursor: pointer;
-    float: right;
-    margin-left: 0.5rem;
-}
-
 .brandButton {
     text-align: center;
     font-size: 1.75rem;
@@ -129,9 +120,24 @@ body {
 }
 
 .brandTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
     padding-left: 0.5rem;
-    font-size: 2rem;
+    padding-right: 0.5rem;
+    font-size: 1.75rem;
     padding-bottom: 0.5rem;
+}
+
+.titleButtons {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+.titleButton {
+    width: 1.875rem;
+    height: 1.875rem;
+    cursor: pointer;
 }
 
 .brandList {
