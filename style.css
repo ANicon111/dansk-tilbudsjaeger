@@ -56,7 +56,7 @@ body {
     object-fit: contain;
 }
 
-#brandSettings {
+#brandSettings, #brandHelp, #langMenu {
     display: none;
     position: absolute;
     width: calc(100% - 2rem);
@@ -64,14 +64,16 @@ body {
     padding: 1rem;
     background-color: rgba(0, 0, 0, 0.75);
     overflow: scroll;
+    z-index: 100; /* Ensures menus stay on top */
 }
 
+/* Update this block in style.css to prevent icons overlapping */
 .settingsButton {
     width: 2.5rem;
     height: 2.5rem;
     cursor: pointer;
     float: right;
-    margin-left: -2.5rem;
+    margin-left: 0.5rem;
 }
 
 .brandButton {
@@ -127,7 +129,7 @@ body {
 }
 
 .brandTitle {
-    text-align: center;
+    padding-left: 0.5rem;
     font-size: 2rem;
     padding-bottom: 0.5rem;
 }

@@ -169,6 +169,32 @@ class Brand {
         return null;
     }
 
+    helpHtml() {
+        let html = `
+            <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
+                <h2 class="sallingSettingsTitle">${lang.helpTitle(this.name)}</h2>
+                <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1rem;">
+                    ${lang.helpStoreInstructions[this.id()] ?? lang.helpStoreInstructions[this.shorthand] ?? lang.helpStoreInstructions[this.name] ?? lang.helpStoreInstructions.default}
+                </p>
+                <h3 class="sallingSettingsTitle" style="font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.5rem;">${lang.settingsHelpTitle}</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
+        `;
+        for (const property in this.settings) {
+            const helpText = lang.helpSettings?.[property] ?? lang.helpSettingsPlaceholder(property);
+            html += `
+                <div>
+                    <strong style="font-size: 0.95rem;">${property}</strong>
+                    <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; line-height: 1.4;">${helpText}</p>
+                </div>
+            `;
+        }
+        html += `
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
     store() {
         localStorage.setItem(`settings-${this.id()}`, JSON.stringify(this.settings));
         localStorage.setItem(`stored-${this.id()}`, JSON.stringify(this.stored));
@@ -529,5 +555,5 @@ function productContainsKeyword(prod, keyword) {
 
 
 const assets = {
-    placeholderProduct: "../assets/product.png",
+    placeholderProduct: "../assets/product.webp",
 };

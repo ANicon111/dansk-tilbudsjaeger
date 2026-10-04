@@ -99,8 +99,16 @@ function brandBackground(brand) {
 function loadingBrandHtml(brand) {
     const loyaltyHtml = brand.loyaltyHtml();
     const brandId = brand.id();
+    const isLightAccent = (brand.accentColor[0] + brand.accentColor[1] + brand.accentColor[2]) / 3 > 127;
+    const invertFilter = isLightAccent ? 'style="filter: invert();"' : '';
     return `
-            <div class="brandTitle" style="${brandBackground(brand)}">${brand.name}<img class="settingsButton" ${(brand.accentColor[0] + brand.accentColor[1] + brand.accentColor[2]) / 3 > 127 ? `style="filter: invert();"` : ''} src="../assets/configure.webp" onclick="openSettings('${brand.id()}')"></div>
+            <div class="brandTitle" style="${brandBackground(brand)}">${brand.name}
+                <div style="float: right;">
+                    <img class="settingsButton" ${invertFilter} src="../assets/language.webp" title="${lang.selectLanguage}" onclick="openLanguageMenu()">
+                    <img class="settingsButton" ${invertFilter} src="../assets/help.webp" title="${lang.helpTitle(brand.name)}" onclick="openHelp('${brand.id()}')">
+                    <img class="settingsButton" ${invertFilter} src="../assets/configure.webp" title="${lang.settingsTitle(brand.name)}" onclick="openSettings('${brand.id()}')">
+                </div>
+            </div>
             <div class="filter">
                 <label>${lang.productKeywords}</label>
                 <input id="${brandId}-filter" class="globalProductFilter" type="text" value="${(globalProductFilter || []).join(', ')}" placeholder="${lang.keywordsPlaceholder}">
@@ -278,6 +286,57 @@ async function applyAndCloseSettings(brandId) {
     }
 }
 
+// Add these modal controller functions:
+function openHelp(brandId) {
+    const brand = getBrandById(brandId);
+    const brandHelp = document.getElementById("brandHelp");
+    brandHelp.innerHTML = brand.helpHtml();
+    brandHelp.style.display = "block";
+}
+
+function closeHelp() {
+    const brandHelp = document.getElementById("brandHelp");
+    if (brandHelp) brandHelp.style.display = "none";
+}
+
+function openLanguageMenu() {
+    const languages = [
+        { code: 'en', native: 'English' },
+        { code: 'da', native: 'Dansk' },
+        { code: 'ro', native: 'Română' },
+        { code: 'de', native: 'Deutsch' },
+        { code: 'fr', native: 'Français' }
+    ];
+
+    let optionsHtml = languages.map(l => `
+        <button class="settingsApplyBtn" style="width:100%; margin-bottom:0.5rem;" onclick="switchLanguage('${l.code}')">
+            ${l.native}
+        </button>
+    `).join('');
+
+    const langMenu = document.getElementById("langMenu");
+    langMenu.innerHTML = `
+        <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
+            <h2 class="sallingSettingsTitle">${lang.selectLanguage}</h2>
+            <div style="margin-top: 1rem;">
+                ${optionsHtml}
+            </div>
+        </div>
+    `;
+    langMenu.style.display = "block";
+}
+
+function closeLanguageMenu() {
+    const langMenu = document.getElementById("langMenu");
+    if (langMenu) langMenu.style.display = "none";
+}
+
+function switchLanguage(langCode) {
+    localStorage.setItem("preferred-language", langCode);
+    const params = new URL(window.location.href).searchParams.toString();
+    window.location.href = `../${langCode}/index.html?${params}`;
+}
+
 /**
  * @param {string} productId 
  */
@@ -371,6 +430,7 @@ async function main() {
         `;
         brandSelector.innerHTML += `<span class="brandButton" id="${brand.id()}-button" onclick="selectBrand('${brand.id()}')">${brand.shorthand}</span>`
     }
+    
     selectBrand(localStorage.getItem("selected-brand") ?? supportedBrands.entries().next().value[0]);
 
     emptyCallbackQueue();
