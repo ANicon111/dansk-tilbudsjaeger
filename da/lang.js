@@ -3,42 +3,76 @@ const lang = {
     selectLanguage: "Vælg sprog",
     close: "Luk",
     storeInstructionsTitle: "Butiksinformation",
-    settingsHelpTitle: "Vejledning til indstillinger",
+    settingsHelpTitle: "Indstillinger forklaret",
     helpTitle(brandName) {
-        return `Hjælp til ${brandName}`;
+        return `${brandName} Hjælp`;
     },
     helpSettingsPlaceholder(settingName) {
-        return `Instruktioner til indstillingen "${settingName}" tilføjes i en fremtidig opdatering.`;
+        return `Vejledning til indstillingen "${settingName}" tilføjes i en kommende opdatering.`;
     },
     helpStoreInstructions: {
-        default: "Denne butik samler tilbud fra sine tilbudsaviser eller lokale datokritiske tilbud. Bemærk at alle produktnavne og kategorier hentes på dansk.",
-        "Brug": "Viser aktuelle tilbud og kampagner for Brugsen (hentes på dansk).",
-        "SB&K": "Viser aktuelle tilbud og kampagner for SuperBrugsen og Kvickly (hentes på dansk).",
-        "365": "Viser lavpristilbud for 365 discount (hentes på dansk).",
-        "Lidl": "Henter aktuelle kampagnetilbud for Lidl på dansk. Online-varer udelades automatisk.",
-        "Rema": "Henter aktive varer og kampagnetilbud for Rema 1000 på dansk.",
-        "Netto": "Viser Nettos tilbudsaviser samt lokale datovarer for valgte butikker (på dansk).",
-        "Bilka": "Viser Bilkas tilbudsaviser samt lokale datovarer for valgte delivered butikker (på dansk).",
-        "Føtex": "Viser Føtex' tilbudsaviser samt lokale datovarer for valgte delivered butikker (på dansk)."
+        default: "Denne butik samler tilbud fra sin tilbudsavis eller lokale restpartier. Bemærk at alle produkttitler, kategorier og detaljer altid hentes på dansk.",
+        "Brug": "Viser aktive tilbud for Brugsen-butikker. Produktdetaljer hentes på dansk.",
+        "SB&K": "Viser aktive tilbud for SuperBrugsen og Kvickly. Produktdetaljer hentes på dansk.",
+        "365": "Viser rabattilbud for 365discount-butikker. Produktdetaljer hentes på dansk.",
+        "Lidl": "Henter aktuelle kampagnetilbud fra Lidl (på dansk). Online-varer udelades automatisk.",
+        "Rema": "Henter aktive kampagnevarer og tilbud for Rema 1000 (på dansk).",
+        "Netto": "Viser Nettos ugentlige tilbudsavis samt lokale gul-mærke datovarer for bestemte butikker (på dansk).",
+        "Bilka": "Viser Bilkas ugentlige tilbudsavis samt lokale datovarer for bestemte butikker (på dansk).",
+        "Føtex": "Viser Føtex' ugentlige tilbudsavis samt lokale datovarer for bestemte butikker (på dansk)."
     },
-    helpSettings: {
-        enabled: "Slår til/fra om denne butik indlæses i feedet.",
-        loyaltyCode: "Dit medlemsnummer til at generere en stregkode i appen.",
-        updatePeriodMinutes: "Hvor ofte (i minutter) appen opdaterer tilbud.",
-        ignoreThreshold: "Minimumsscore for tilbud. Tilbud under dette skjules.",
-        leafletBlacklist: "Kommaseparerede danske nøgleord. Tilbudsaviser med disse ord springes over.",
-        dataSaver: "Indlæser mindre billeder for at spare data.",
-        enabledStoreList: "Kommasepareret liste over butiksnavne eller byer. Et specifikt butiksnavn (fundet på <a href=\"https://netto.dk/find-butik/\">netto.dk</a>, <a href=\"https://foetex.dk/kundeservice/find-din-foetex/\">foetex.dk</a> eller <a href=\"https://bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/\">bilka.dk</a>) vil kun søge i den enkelte butik efter lokale tilbud. Et bynavn vil søge efter butikker i byen op til grænsen 'Maks. butikker pr. indtastning'.",
-        maxStoresPerEnabled: "Maksimalt antal fysiske butikker der søges efter pr. indtastning på din liste.",  
-        promotionCategoryBlacklist: "Kommasepareret liste af kampagnekategorier der skal skjules.",
-        printReceipt: "Beder kassen om at udskrive en papirbon (kun Lidl)."
+    settings: {
+        enabled: {
+            name: "Aktiver butik",
+            description: "Tænder eller slukker for, om denne butik er aktiv og indlæses i det samlede tilbudsfeed."
+        },
+        loyaltyCode: {
+            name: "Lokalitets-/Medlemskode",
+            placeholder: "Indtast medlemskode",
+            description: "Gemmer dit medlemsnummer for at generere en scanningsklar stregkode i appen."
+        },
+        updatePeriodMinutes: {
+            name: "Opdatering (Min)",
+            description: "Hvor ofte (i minutter) applikationen genopfrisker tilbud."
+        },
+        ignoreThreshold: {
+            name: "Ignorer grænseværdi",
+            description: "Minimum tilbudsscore påkrævet. Tilbud under denne grænse skjules."
+        },
+        leafletBlacklist: {
+            name: "Tilbudsavis blackliste",
+            placeholder: "f.eks. nonfood, Prosonic",
+            description: "Kommaseparerede søgeord (på dansk). Tilbudsaviser, der matcher disse ord, springes over."
+        },
+        dataSaver: {
+            name: "Databesparelse",
+            description: "Aktiverer lavopløselige billeder for at reducere mobildataforbrug."
+        },
+        enabledStoreList: {
+            name: "Butiksnavne/Byer",
+            placeholder: "f.eks. Sønderborg, Lufthavn",
+            description: "Kommasepareret liste over butiksnavne eller byer. Et specifikt butiksnavn (fundet på <a href=\"https://netto.dk/find-butik/\">netto.dk</a>, <a href=\"https://foetex.dk/kundeservice/find-din-foetex/\">foetex.dk</a> eller <a href=\"https://bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/\">bilka.dk</a>) vil kun forespørge den enkelte butik. Et bynavn vil søge efter butikker i byen op til grænsen 'Maks butikker pr. postering'."
+        },
+        maxStoresPerEnabled: {
+            name: "Maks butikker pr. by",
+            description: "Maksimalt antal fysiske butikker der forespørges pr. postering på din liste."
+        },
+        promotionCategoryBlacklist: {
+            name: "Kategori blackliste",
+            placeholder: "f.eks. parkside, Frugt og Grønt",
+            description: "Kommasepareret liste over kampagnekategorier (på dansk), der skal skjules."
+        },
+        printReceipt: {
+            name: "Udskriv kvittering",
+            description: "Instruerer kassescanneren til at udskrive en fysisk papirkvittering (kun Lidl)."
+        }
     },
     errorPrefix: "FEJL",
     search: "Søg",
     searching: "Søger...",
     lastUpdate: "Seneste opdatering",
     availableProducts(count, countColor, store, location) {
-        return `<span style="color: ${countColor}; font-weight: bold;">${count}</span> tilgængelige i <strong>${store}${location != null ? ` (${location})` : ''}</strong>.`
+        return `<span style="color: ${countColor}; font-weight: bold;">${count}</span> tilgængelig i <strong>${store}${location != null ? ` (${location})` : ''}</strong>.`
     },
     errors: {
         failedStoreList(brand) {
@@ -51,13 +85,13 @@ const lang = {
             return `Kunne ikke hente tilbudsavis for ${brand}.`
         },
         invalidBrand(lineText, lineNumber) {
-            return `Ugyldig butik på linje "${lineText}" (nummer ${lineNumber}).`
+            return `Ugyldigt mærke på linje "${lineText}" (nummer ${lineNumber}).`
         }
     },
     warningPrefix: "Advarsel",
     warnings: {
         noPromotions(brand, keywords) {
-            return `Kunne ikke finde nogen tilbud for ${brand} der matcher ${keywords}.`
+            return `Kunne ikke finde nogen tilbud for ${brand}, der matcher ${keywords}.`
         },
         noStoreMatches(lineText, lineNumber) {
             return `Kunne ikke finde nogen lokale butiksmatch for "${lineText}" på linje ${lineNumber}.`
@@ -65,7 +99,7 @@ const lang = {
     },
     messages: {
         foundPromotions(promotionCount, brandCount, storeCount) {
-            return `Fandt ${promotionCount} tilbud hos ${brandCount} kæder` + (storeCount > 0 ? ` i ${storeCount} butikker.` : '.');
+            return `Fandt ${promotionCount} tilbud for ${brandCount} mærker` + (storeCount > 0 ? ` i ${storeCount} butikker.` : '.');
         },
         noPromotions: "Kunne ikke finde nogen tilbud.",
     },
@@ -75,18 +109,18 @@ const lang = {
         "dairy": "Mejeri",
         "eggs": "Æg",
         "drinks": "Drikkevarer",
-        "bread": "Brød & Bageri",
+        "bread": "Brød",
         "cupboard": "Kolonial",
-        "semiprepared": "Nemt & Hurtigt",
-        "dessert": "Dessert & Slik",
-        "misc": "Diverse",
+        "semiprepared": "Færdigretter",
+        "dessert": "Dessert",
+        "misc": "Andre",
     },
     dkk: "DKK",
     perUnit: "DKK /",
     stock: "på lager",
     from: "Fra",
     to: "til",
-    productKeywords: "Produktnøgleord (danske ord)",
+    productKeywords: "Produktnøgleord (danske termer)",
     keywordsPlaceholder: "f.eks. mælk, smør, kaffe",
     apply: "Anvend",
     loading: "Indlæser...",
@@ -101,26 +135,12 @@ const lang = {
     stockCount(count) {
         return `${count}+ ${this.stock}`;
     },
-    enableStore: "Aktivér Butik",
-    loyaltyCode: "Medlemskode",
     invalidLoyaltyCode: "Ugyldig medlemskode",
-    enterLoyaltyCode: "Indtast medlemskode",
-    updatePeriod: "Opdatering (Min)",
-    ignoreThreshold: "Ignorer Grænse",
-    applySettings: "Gem og anvend",
+    applySettings: "Gem",
     settingsTitle(brandName) {
-        return `${brandName} indstillinger`;
+        return `${brandName} Indstillinger`;
     },
     enterSetting(settingName) {
         return `Indtast ${settingName}`;
-    },
-    leafletBlacklist: "Avis Blacklist",
-    leafletBlacklistPlaceholder: "f.eks. nonfood, Prosonic",
-    enabledStores: "Butiksnavne/Byer",
-    enabledStoresPlaceholder: "f.eks. Sønderborg, Lufthavn",
-    maxStoresPerEnabled: "Maks Butikker pr. By",
-    dataSaverMode: "Data Saver",
-    promotionCategoryBlacklist: "Kategori Blacklist",
-    promotionCategoryBlacklistPlaceholder: "f.eks. parkside, Frugt og Grønt",
-    printReceipt: "Udskriv Bon",
+    }
 };

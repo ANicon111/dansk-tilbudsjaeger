@@ -14,19 +14,12 @@ class Coop extends Brand {
         this.apiName = apiName;
         this.accentColor = accentColor;
         this.settingConfigs.loyaltyCode = new SettingConfig(
-            (settings) => {
-                return `
-                <div class="settingRow">
-                <label>Coop Loyalty Code</label>
-                <input class="setting-loyaltyCode" type="text" value="${this.settings.loyaltyCode ?? ''}" placeholder="Enter loyalty code">
-                </div>
-                `;
-            },
+            this.settingConfigs.loyaltyCode.html,
             (settings) => {
                 const code = document.getElementsByClassName("setting-loyaltyCode")[0].value.trim();
                 if (code != this.settings.loyaltyCode) {
                     const b = getBrandById("brand-Brugsen");
-                    const sb = getBrandById("brand-SuperBrugsen%20%26%20Kvickly");
+                    const sb = getBrandById("brand-SuperBrugsen%20%26&nbspKvickly");
                     const d = getBrandById("brand-365%20discount");
                     b.settings.loyaltyCode = code;
                     sb.settings.loyaltyCode = code;
@@ -47,7 +40,7 @@ class Coop extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Leaflet Blacklist (comma-separated)</label>
+                        <label>${lang.settings.leafletBlacklist.name}</label>
                         <input class="setting-leafletBlacklist" type="text" value="${(settings.leafletBlacklist || []).join(', ')}" placeholder="e.g. nonfood, Prosonic">
                     </div>
                 `;
@@ -64,7 +57,7 @@ class Coop extends Brand {
                     <div class="settingRow checkboxRow">
                         <label class="settingLabelCheckbox">
                             <input class="setting-dataSaver" type="checkbox" ${settings.dataSaver ? 'checked' : ''}>
-                            <span>Data Saver Mode</span>
+                            <span>${lang.settings.dataSaver.name}</span>
                         </label>
                     </div>
                 `;

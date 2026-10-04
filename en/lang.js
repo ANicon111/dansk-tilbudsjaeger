@@ -21,17 +21,51 @@ const lang = {
         "Bilka": "Displays Bilka weekly leaflets as well as local clearance items for specified stores (in Danish).",
         "Føtex": "Displays Føtex weekly leaflets as well as local clearance items for specified stores (in Danish)."
     },
-    helpSettings: {
-        enabled: "Toggles whether this store is active and loaded into the main deals feed.",
-        loyaltyCode: "Stores your loyalty membership number to generate a scannable barcode in the app.",
-        updatePeriodMinutes: "How frequently (in minutes) the application refreshes deals.",
-        ignoreThreshold: "Minimum deal value score required. Offers below this threshold are hidden.",
-        leafletBlacklist: "Comma-separated keywords (in Danish). Leaflets matching these words will be skipped.",
-        dataSaver: "Enables low-resolution thumbnails to reduce mobile data usage.",
-        enabledStoreList: "Comma-separated list of store names or cities. A specific store name (found at <a href=\"https://netto.dk/find-butik/\">netto.dk</a>, <a href=\"https://foetex.dk/kundeservice/find-din-foetex/\">foetex.dk</a>, or <a href=\"https://bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/\">bilka.dk</a>) will only query that one store for local promotions. A city name will query stores in the city up to the 'Max Stores per Entry' limit.",
-        maxStoresPerEnabled: "Maximum number of physical stores queried per entry in your list.",
-        promotionCategoryBlacklist: "Comma-separated list of campaign categories (in Danish) to hide.",
-        printReceipt: "Instructs the checkout scanner to print a physical paper receipt (Lidl only)."
+    settings: {
+        enabled: {
+            name: "Enable Store",
+            description: "Toggles whether this store is active and loaded into the main deals feed."
+        },
+        loyaltyCode: {
+            name: "Loyalty Code",
+            placeholder: "Enter loyalty code",
+            description: "Stores your loyalty membership number to generate a scannable barcode in the app."
+        },
+        updatePeriodMinutes: {
+            name: "Update (Min)",
+            description: "How frequently (in minutes) the application refreshes deals."
+        },
+        ignoreThreshold: {
+            name: "Ignore Threshold",
+            description: "Minimum deal value score required. Offers below this threshold are hidden."
+        },
+        leafletBlacklist: {
+            name: "Leaflet Blacklist",
+            placeholder: "e.g. nonfood, Prosonic",
+            description: "Comma-separated keywords (in Danish). Leaflets matching these words will be skipped."
+        },
+        dataSaver: {
+            name: "Data Saver",
+            description: "Enables low-resolution thumbnails to reduce mobile data usage."
+        },
+        enabledStoreList: {
+            name: "Store Names/Cities",
+            placeholder: "e.g. Sønderborg, Lufthavn",
+            description: "Comma-separated list of store names or cities. A specific store name (found at <a href=\"https://netto.dk/find-butik/\">netto.dk</a>, <a href=\"https://foetex.dk/kundeservice/find-din-foetex/\">foetex.dk</a>, or <a href=\"https://bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/\">bilka.dk</a>) will only query that one store for local promotions. A city name will query stores in the city up to the 'Max Stores per Entry' limit."
+        },
+        maxStoresPerEnabled: {
+            name: "Max Stores per City",
+            description: "Maximum number of physical stores queried per entry in your list."
+        },
+        promotionCategoryBlacklist: {
+            name: "Category Blacklist",
+            placeholder: "e.g. parkside, Frugt og Grønt",
+            description: "Comma-separated list of campaign categories (in Danish) to hide."
+        },
+        printReceipt: {
+            name: "Print Receipt",
+            description: "Instructs the checkout scanner to print a physical paper receipt (Lidl only)."
+        }
     },
     errorPrefix: "ERROR",
     search: "Search",
@@ -101,26 +135,12 @@ const lang = {
     stockCount(count) {
         return `${count}+ ${this.stock}`;
     },
-    enableStore: "Enable Store",
-    loyaltyCode: "Loyalty Code",
     invalidLoyaltyCode: "Invalid loyalty code",
-    enterLoyaltyCode: "Enter loyalty code",
-    updatePeriod: "Update (Min)",
-    ignoreThreshold: "Ignore Threshold",
     applySettings: "Apply",
     settingsTitle(brandName) {
         return `${brandName} Settings`;
     },
     enterSetting(settingName) {
         return `Enter ${settingName}`;
-    },
-    leafletBlacklist: "Leaflet Blacklist",
-    leafletBlacklistPlaceholder: "e.g. nonfood, Prosonic",
-    enabledStores: "Store Names/Cities",
-    enabledStoresPlaceholder: "e.g. Sønderborg, Lufthavn",
-    maxStoresPerEnabled: "Max Stores per City",
-    dataSaverMode: "Data Saver",
-    promotionCategoryBlacklist: "Category Blacklist",
-    promotionCategoryBlacklistPlaceholder: "e.g. parkside, Frugt og Grønt",
-    printReceipt: "Print Receipt",
+    }
 };

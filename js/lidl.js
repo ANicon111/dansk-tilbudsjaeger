@@ -49,8 +49,8 @@ class Lidl extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>Promotion Category Blacklist (comma-separated)</label>
-                        <input class="setting-promotionCategoryBlacklist" type="text" value="${(settings.promotionCategoryBlacklist || []).join(', ')}" placeholder="e.g. parkside, Frugt og Grønt">
+                        <label>${lang.settings.promotionCategoryBlacklist.name}</label>
+                        <input class="setting-promotionCategoryBlacklist" type="text" value="${(settings.promotionCategoryBlacklist || []).join(', ')}" placeholder="${lang.settings.promotionCategoryBlacklist.placeholder}">
                     </div>
                 `;
             },
@@ -66,7 +66,7 @@ class Lidl extends Brand {
                     <div class="settingRow checkboxRow">
                         <label class="settingLabelCheckbox">
                             <input class="setting-printReceipt" type="checkbox" ${settings.printReceipt ? 'checked' : ''}>
-                            <span>Print Receipt</span>
+                            <span>${lang.settings.printReceipt.name}</span>
                         </label>
                     </div>
                 `;

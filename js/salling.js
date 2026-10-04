@@ -90,7 +90,7 @@ class Salling extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>${lang.leafletBlacklist}</label>
+                        <label>${lang.settings.leafletBlacklist.name}</label>
                         <input class="setting-leafletBlacklist" type="text" value="${(settings.leafletBlacklist || []).join(', ')}" placeholder="${lang.leafletBlacklistPlaceholder}">
                     </div>
                 `;
@@ -105,8 +105,8 @@ class Salling extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>${lang.enabledStores}</label>
-                        <input class="setting-enabledStoreList" type="text" value="${(settings.enabledStoreList || []).join(', ')}" placeholder="${lang.enabledStoresPlaceholder}">
+                        <label>${lang.settings.enabledStoreList.name}</label>
+                        <input class="setting-enabledStoreList" type="text" value="${(settings.enabledStoreList || []).join(', ')}" placeholder="${lang.settings.enabledStoreList.placeholder}">
                     </div>
                 `;
             },
@@ -124,7 +124,7 @@ class Salling extends Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>${lang.maxStoresPerEnabled}</label>
+                        <label>${lang.settings.maxStoresPerEnabled.name}</label>
                         <input class="setting-maxStoresPerEnabled" type="number" min="1" value="${settings.maxStoresPerEnabled}">
                     </div>
                 `;
@@ -148,7 +148,7 @@ class Salling extends Brand {
                     <div class="settingRow checkboxRow">
                         <label class="settingLabelCheckbox">
                             <input class="setting-dataSaver" type="checkbox" ${settings.dataSaver ? 'checked' : ''}>
-                            <span>${lang.dataSaverMode}</span>
+                            <span>${lang.settings.dataSaver.name}</span>
                         </label>
                     </div>
                 `;

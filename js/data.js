@@ -36,10 +36,12 @@ function defaultSettingConfig(name) {
     return {
         name: name,
         html(settings) {
+            const label = lang.settings?.[this.name]?.name ?? this.name;
+            const placeholder = lang.settings?.[this.name]?.placeholder ?? lang.enterSetting(label);
             return `
             <div class="settingRow">
-                <label>${this.name}</label>
-                <input class="setting-${this.name}" type="text" value="${JSON.stringify(settings[this.name]).replaceAll("\"", "&quot;")}" placeholder="${lang.enterSetting(this.name)}">
+                <label>${label}</label>
+                <input class="setting-${this.name}" type="text" value="${JSON.stringify(settings[this.name]).replaceAll("\"", "&quot;")}" placeholder="${placeholder}">
             </div>
         `;
         },
@@ -79,7 +81,7 @@ class Brand {
                     <div class="settingRow checkboxRow">
                         <label class="settingLabelCheckbox">
                             <input class="setting-enabled" type="checkbox" ${settings.enabled ? 'checked' : ''}>
-                            <span>${lang.enableStore}</span>
+                            <span>${lang.settings.enabled.name}</span>
                         </label>
                     </div>
                 `;
@@ -93,8 +95,8 @@ class Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>${lang.loyaltyCode}</label>
-                        <input class="setting-loyaltyCode" type="text" value="${settings.loyaltyCode ?? ''}" placeholder="${lang.enterLoyaltyCode}">
+                        <label>${lang.settings.loyaltyCode.name}</label>
+                        <input class="setting-loyaltyCode" type="text" value="${settings.loyaltyCode ?? ''}" placeholder="${lang.settings.loyaltyCode.placeholder}">
                     </div>
                 `;
             },
@@ -108,7 +110,7 @@ class Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>${lang.updatePeriod}</label>
+                        <label>${lang.settings.updatePeriodMinutes.name}</label>
                         <input class="setting-updatePeriodMinutes" type="number" min="1" value="${settings.updatePeriodMinutes}">
                     </div>
                 `;
@@ -127,7 +129,7 @@ class Brand {
             (settings) => {
                 return `
                     <div class="settingRow">
-                        <label>${lang.ignoreThreshold}</label>
+                        <label>${lang.settings.ignoreThreshold.name}</label>
                         <input class="setting-ignoreThreshold" type="number" min="0" value="${settings.ignoreThreshold}">
                     </div>
                 `;
@@ -171,7 +173,7 @@ class Brand {
 
     helpHtml() {
         let html = `
-            <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
+            <div class="fullScreenContainer">
                 <h2 class="sallingSettingsTitle">${lang.helpTitle(this.name)}</h2>
                 <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1rem;">
                     ${lang.helpStoreInstructions[this.id()] ?? lang.helpStoreInstructions[this.shorthand] ?? lang.helpStoreInstructions[this.name] ?? lang.helpStoreInstructions.default}
@@ -180,10 +182,12 @@ class Brand {
                 <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
         `;
         for (const property in this.settings) {
-            const helpText = lang.helpSettings?.[property] ?? lang.helpSettingsPlaceholder(property);
+            const settingInfo = lang.settings?.[property];
+            const helpText = settingInfo?.description ?? lang.helpSettingsPlaceholder(property);
+            const settingName = settingInfo?.name ?? property;
             html += `
                 <div>
-                    <strong style="font-size: 0.95rem;">${property}</strong>
+                    <strong style="font-size: 0.95rem;">${settingName}</strong>
                     <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; line-height: 1.4;">${helpText}</p>
                 </div>
             `;
@@ -226,7 +230,7 @@ class Brand {
 
     settingsHtml() {
         let html = `
-            <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
+            <div class="fullScreenContainer" onclick="event.stopPropagation();">
                 <h2 class="sallingSettingsTitle">${lang.settingsTitle(this.name)}</h2>
         `;
         for (const property in this.settings) {

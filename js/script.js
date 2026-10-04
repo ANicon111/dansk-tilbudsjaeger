@@ -316,7 +316,7 @@ function openLanguageMenu() {
 
     const langMenu = document.getElementById("langMenu");
     langMenu.innerHTML = `
-        <div class="sallingSettingsContainer" onclick="event.stopPropagation();">
+        <div class="fullScreenContainer">
             <h2 class="sallingSettingsTitle">${lang.selectLanguage}</h2>
             <div style="margin-top: 1rem;">
                 ${optionsHtml}
@@ -430,7 +430,7 @@ async function main() {
         `;
         brandSelector.innerHTML += `<span class="brandButton" id="${brand.id()}-button" onclick="selectBrand('${brand.id()}')">${brand.shorthand}</span>`
     }
-    
+
     selectBrand(localStorage.getItem("selected-brand") ?? supportedBrands.entries().next().value[0]);
 
     emptyCallbackQueue();

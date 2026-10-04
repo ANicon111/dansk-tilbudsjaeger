@@ -56,7 +56,9 @@ body {
     object-fit: contain;
 }
 
-#brandSettings, #brandHelp, #langMenu {
+#brandSettings,
+#brandHelp,
+#langMenu {
     display: none;
     position: absolute;
     width: calc(100% - 2rem);
@@ -64,7 +66,8 @@ body {
     padding: 1rem;
     background-color: rgba(0, 0, 0, 0.75);
     overflow: scroll;
-    z-index: 100; /* Ensures menus stay on top */
+    z-index: 100;
+    /* Ensures menus stay on top */
 }
 
 .brandButton {
@@ -242,7 +245,7 @@ body {
     background-color: white;
 }
 
-.sallingSettingsContainer {
+.fullScreenContainer {
     margin: auto;
     display: flex;
     flex-direction: column;

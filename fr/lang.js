@@ -3,69 +3,103 @@ const lang = {
     selectLanguage: "Choisir la langue",
     close: "Fermer",
     storeInstructionsTitle: "Informations sur le magasin",
-    settingsHelpTitle: "Guide des paramètres",
+    settingsHelpTitle: "Explication des paramètres",
     helpTitle(brandName) {
         return `Aide ${brandName}`;
     },
     helpSettingsPlaceholder(settingName) {
-        return `Les instructions pour le paramètre "${settingName}" seront ajoutées lors d'une future mise à jour.`;
+        return `Les instructions pour le paramètre "${settingName}" seront ajoutées dans une future mise à jour.`;
     },
     helpStoreInstructions: {
-        default: "Ce magasin regroupe les promotions de ses prospectus ou ses déstockages locaux. Notez que tous les noms de produits, catégories et détails sont toujours récupérés en danois.",
-        "Brug": "Affiche les offres actuelles pour les magasins Brugsen (récupérées en danois).",
-        "SB&K": "Affiche les promotions actuelles pour SuperBrugsen et Kvickly (récupérées en danois).",
-        "365": "Affiche les offres à prix réduit pour 365 discount (récupérées en danois).",
-        "Lidl": "Affiche les offres Lidl en danois. Les articles en ligne sont automatiquement exclus.",
-        "Rema": "Affiche les articles et offres Rema 1000 en danois.",
-        "Netto": "Affiche les prospectus hebdomadaires Netto ainsi que les déstockages locaux (en danois).",
-        "Bilka": "Affiche les prospectus hebdomadaires Bilka ainsi que les déstockages locaux (en danois).",
-        "Føtex": "Affiche les prospectus hebdomadaires Føtex ainsi que les déstockages locaux (en danois)."
+        default: "Ce magasin regroupe les offres de ses prospectus ou les déstockages locaux. Notez que tous les titres de produits, catégories et détails sont toujours récupérés en danois.",
+        "Brug": "Affiche les promotions actives pour les magasins Brugsen. Les détails des produits sont récupérés en danois.",
+        "SB&K": "Affiche les promotions actives pour SuperBrugsen et Kvickly. Les détails des produits sont récupérés en danois.",
+        "365": "Affiche les réductions pour les magasins 365 discount. Les détails des produits sont récupérés en danois.",
+        "Lidl": "Récupère les offres de campagne actuelles de Lidl (en danois). Les articles exclusivement en ligne sont automatiquement exclus.",
+        "Rema": "Récupère les articles en promotion active et les offres de campagne pour Rema 1000 (en danois).",
+        "Netto": "Affiche les prospectus hebdomadaires de Netto ainsi que les articles en déstockage local avec étiquette jaune (en danois).",
+        "Bilka": "Affiche les prospectus hebdomadaires de Bilka ainsi que les articles en déstockage local (en danois).",
+        "Føtex": "Affiche les prospectus hebdomadaires de Føtex ainsi que les articles en déstockage local (en danois)."
     },
-    helpSettings: {
-        enabled: "Active ou désactive ce magasin dans le flux principal.",
-        loyaltyCode: "Votre numéro de membre pour générer le code-barres dans l'application.",
-        updatePeriodMinutes: "Fréquence (en minutes) de mise à jour des offres.",
-        ignoreThreshold: "Score minimum. Les offres en dessous sont masquées.",
-        leafletBlacklist: "Mots-clés en danois (séparés par des virgules). Les prospectus les contenant seront ignorés.",
-        dataSaver: "Charge de petites images pour économiser les données mobiles.",
-        enabledStoreList: "Liste séparée par des virgules de noms de magasins ou de villes. Un nom de magasin spécifique (trouvé sur <a href=\"https://netto.dk/find-butik/\">netto.dk</a>, <a href=\"https://foetex.dk/kundeservice/find-din-foetex/\">foetex.dk</a> ou <a href=\"https://bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/\">bilka.dk</a>) ne recherchera des promotions locales que pour ce magasin. Un nom de ville recherchera les magasins de la ville dans la limite du « Nombre max de magasins par entrée ».",
-        maxStoresPerEnabled: "Nombre maximal de magasins physiques interrogés par entrée dans votre liste.",
-        promotionCategoryBlacklist: "Catégories en danois (séparées par des virgules) à masquer.",
-        printReceipt: "Demande l'impression du reçu papier en caisse (Lidl uniquement)."
+    settings: {
+        enabled: {
+            name: "Activer le magasin",
+            description: "Active ou désactive la présence de ce magasin dans le flux principal des offres."
+        },
+        loyaltyCode: {
+            name: "Code de fidélité",
+            placeholder: "Entrez le code de fidélité",
+            description: "Enregistre votre numéro de membre pour générer un code-barres scannable dans l'application."
+        },
+        updatePeriodMinutes: {
+            name: "Mise à jour (Min)",
+            description: "Fréquence (en minutes) à laquelle l'application rafraîchit les offres."
+        },
+        ignoreThreshold: {
+            name: "Seuil d'ignorance",
+            description: "Score de valeur d'offre minimal requis. Les offres inférieures à ce seuil sont masquées."
+        },
+        leafletBlacklist: {
+            name: "Liste noire de prospectus",
+            placeholder: "ex. nonfood, Prosonic",
+            description: "Mots-clés séparés par des virgules (en danois). Les prospectus correspondant à ces mots seront ignorés."
+        },
+        dataSaver: {
+            name: "Économiseur de données",
+            description: "Active les vignettes basse résolution pour réduire l'utilisation des données mobiles."
+        },
+        enabledStoreList: {
+            name: "Noms de magasins / Villes",
+            placeholder: "ex. Sønderborg, Lufthavn",
+            description: "Liste de noms de magasins ou de villes séparés par des virgules. Un nom de magasin spécifique (trouvé sur <a href=\"https://netto.dk/find-butik/\">netto.dk</a>, <a href=\"https://foetex.dk/kundeservice/find-din-foetex/\">foetex.dk</a> ou <a href=\"https://bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/\">bilka.dk</a>) ne requêtera que ce magasin. Un nom de ville requêtera les magasins de la ville jusqu'à la limite 'Max magasins par entrée'."
+        },
+        maxStoresPerEnabled: {
+            name: "Max magasins par ville",
+            description: "Nombre maximum de magasins physiques interrogés par entrée dans votre liste."
+        },
+        promotionCategoryBlacklist: {
+            name: "Liste noire de catégories",
+            placeholder: "ex. parkside, Frugt og Grønt",
+            description: "Liste séparée par des virgules de catégories de campagne (en danois) à masquer."
+        },
+        printReceipt: {
+            name: "Imprimer le reçu",
+            description: "Indique au scanner de caisse d'imprimer un reçu papier physique (Lidl uniquement)."
+        }
     },
     errorPrefix: "ERREUR",
-    search: "Recherche",
-    searching: "Recherche en cours...",
+    search: "Rechercher",
+    searching: "Recherche...",
     lastUpdate: "Dernière mise à jour",
     availableProducts(count, countColor, store, location) {
         return `<span style="color: ${countColor}; font-weight: bold;">${count}</span> disponibles chez <strong>${store}${location != null ? ` (${location})` : ''}</strong>.`
     },
     errors: {
         failedStoreList(brand) {
-            return `Impossible d'obtenir la liste des magasins pour ${brand}.`
+            return `Échec de la récupération de la liste des magasins pour ${brand}.`
         },
         failedLocal(store, location) {
-            return `Impossible d'obtenir les prix locaux pour ${store}${location != null ? ` (${location})` : ''}.`
+            return `Échec de la récupération des prix locaux pour ${store}${location != null ? ` (${location})` : ''}.`
         },
         failedLeaflet(brand) {
-            return `Impossible d'obtenir le prospectus pour ${brand}.`
+            return `Échec de la récupération des offres de prospectus pour ${brand}.`
         },
         invalidBrand(lineText, lineNumber) {
-            return `Marque invalide à la ligne "${lineText}" (numéro ${lineNumber}).`
+            return `Marque non valide à la ligne "${lineText}" (numéro ${lineNumber}).`
         }
     },
     warningPrefix: "Avertissement",
     warnings: {
         noPromotions(brand, keywords) {
-            return `Aucune promotion trouvée pour ${brand} correspondant à ${keywords}.`
+            return `Impossible de trouver des promotions pour ${brand} correspondant à ${keywords}.`
         },
         noStoreMatches(lineText, lineNumber) {
-            return `Aucun magasin local correspondant à "${lineText}" à la ligne ${lineNumber}.`
+            return `Impossible de trouver des correspondances de magasins locaux pour "${lineText}" à la ligne ${lineNumber}.`
         },
     },
     messages: {
         foundPromotions(promotionCount, brandCount, storeCount) {
-            return `Trouvé ${promotionCount} promotions pour ${brandCount} enseignes` + (storeCount > 0 ? ` dans ${storeCount} magasins.` : '.');
+            return `Trouvé ${promotionCount} promotions pour ${brandCount} marques` + (storeCount > 0 ? ` dans ${storeCount} magasins.` : '.');
         },
         noPromotions: "Aucune promotion trouvée.",
     },
@@ -75,18 +109,18 @@ const lang = {
         "dairy": "Produits laitiers",
         "eggs": "Œufs",
         "drinks": "Boissons",
-        "bread": "Pains & Pâtisseries",
+        "bread": "Pain",
         "cupboard": "Épicerie",
         "semiprepared": "Plats préparés",
-        "dessert": "Desserts & Confiseries",
-        "misc": "Divers",
+        "dessert": "Dessert",
+        "misc": "Autres",
     },
     dkk: "DKK",
     perUnit: "DKK /",
     stock: "en stock",
     from: "Du",
     to: "au",
-    productKeywords: "Mots-clés (termes en danois)",
+    productKeywords: "Mots-clés de produits (termes danois)",
     keywordsPlaceholder: "ex. mælk, smør, kaffe",
     apply: "Appliquer",
     loading: "Chargement...",
@@ -101,26 +135,12 @@ const lang = {
     stockCount(count) {
         return `${count}+ ${this.stock}`;
     },
-    enableStore: "Activer Magasin",
-    loyaltyCode: "Code Fidélité",
-    invalidLoyaltyCode: "Code de fidélité invalide",
-    enterLoyaltyCode: "Saisir le code de fidélité",
-    updatePeriod: "Mise à jour (Min)",
-    ignoreThreshold: "Seuil d'ignorance",
-    applySettings: "Enregistrer & Appliquer",
+    invalidLoyaltyCode: "Code de fidélité non valide",
+    applySettings: "Appliquer",
     settingsTitle(brandName) {
         return `Paramètres de ${brandName}`;
     },
     enterSetting(settingName) {
-        return `Saisir ${settingName}`;
-    },
-    leafletBlacklist: "Filtre Prospectus",
-    leafletBlacklistPlaceholder: "ex. nonfood, Prosonic",
-    enabledStores: "Noms Magasins/Villes",
-    enabledStoresPlaceholder: "ex. Sønderborg, Lufthavn",
-    maxStoresPerEnabled: "Max Magasins par Ville",
-    dataSaverMode: "Éco de Données",
-    promotionCategoryBlacklist: "Filtre Catégories",
-    promotionCategoryBlacklistPlaceholder: "ex. parkside, Frugt og Grønt",
-    printReceipt: "Imprimer Reçu",
+        return `Entrer ${settingName}`;
+    }
 };
