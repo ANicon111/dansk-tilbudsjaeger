@@ -29,8 +29,9 @@ function imageCrop(ic) {
 
 /**
  * @param {string} id product id
+ * @param {string} [category] category name (optional)
  */
-function productHtml(id) {
+function productHtml(id, category = null) {
     const prod = products[id];
     const currentTime = new Date();
     const available = prod.sd <= currentTime && currentTime <= (prod.ed ?? currentTime);
@@ -44,6 +45,7 @@ function productHtml(id) {
             </div>
             <div class="prodText">
                 <h2 class="prodName">${prod.n}</h2>
+                ${category != null ? `<span class="prodCategory">${lang.categories[category] ?? category}</span><br>` : ''}
                 <span class="prodPrice">${prod.p} ${lang.dkk}</span>
                 ${prod.op ? `<small class="prodOldPrice">${prod.op} ${lang.dkk}</small>` : ''}
                 <br>
@@ -59,13 +61,15 @@ function productHtml(id) {
 }
 
 /**
- * @param {string} brandId 
- * @param {string} category 
+- 
+@param {string} brandId 
+- 
+@param {string} category 
  */
 function categoryHtml(brandId, category) {
     let idList = productIdsByBrandAndCategory[brandId]?.[category];
     if (globalProductFilter != null && globalProductFilter.length > 0) idList = idList?.filter(id => globalProductFilter.some(keyword => productSearchString(products[id] ?? "").includes(keyword.toLowerCase())));
-    idList?.sort((a, b) => products[b].v - products[a].v);
+    idList?.sort((a, b) => (products[b]?.v ?? 0) - (products[a]?.v ?? 0));
     if (idList != null && idList.length > 0) {
         let productsHtml = "";
         for (const pid of idList) {
@@ -84,7 +88,8 @@ function categoryHtml(brandId, category) {
 }
 
 /**
- * @param {Brand} brand 
+- 
+@param {Brand} brand 
  */
 function brandBackground(brand) {
     const r = brand.accentColor[0];
@@ -94,7 +99,8 @@ function brandBackground(brand) {
 }
 
 /**
- * @param {Brand} brand 
+- 
+@param {Brand} brand 
  */
 function loadingBrandHtml(brand) {
     const loyaltyHtml = brand.loyaltyHtml();
@@ -120,8 +126,11 @@ function loadingBrandHtml(brand) {
         `;
 }
 
+let sortedProductsByBrand = {};
+
 /**
- * @param {Brand} brand 
+- 
+@param {Brand} brand 
  */
 async function loadBrand(brand) {
     if (!brand.settings.enabled) {
@@ -144,10 +153,49 @@ async function loadBrand(brand) {
     }
     const brandList = document.getElementById(`${brandId}-list`);
     brandList.innerHTML = "";
-    for (const category of categories) {
-        html = categoryHtml(brandId, category);
-        if (html != null) {
-            brandList.innerHTML += html;
+
+    if (brand.settings.groupProducts === false) {
+        let allProductsList = [];
+        const brandCategories = productIdsByBrandAndCategory[brandId] ?? {};
+        for (const category of categories) {
+            let idList = brandCategories[category];
+            if (idList != null && idList.length > 0) {
+                let filteredList = [...idList];
+                if (globalProductFilter != null && globalProductFilter.length > 0) {
+                    filteredList = filteredList.filter(id => globalProductFilter.some(keyword => productSearchString(products[id] ?? "").includes(keyword.toLowerCase())));
+                }
+                filteredList.sort((a, b) => (products[b]?.v ?? 0) - (products[a]?.v ?? 0));
+                for (const id of filteredList) {
+                    if (products[id] != null) {
+                        allProductsList.push({ id, category });
+                    }
+                }
+            }
+        }
+        sortedProductsByBrand[brandId] = allProductsList;
+
+        if (allProductsList.length > 0) {
+            let productsHtml = "";
+            for (const item of allProductsList) {
+                productsHtml += productHtml(item.id, item.category);
+            }
+            const allProductsCatId = categoryId(brandId, "all-products");
+            brandList.innerHTML = `
+                <div class="cat" id="${allProductsCatId}">
+                    <div class="catHeader" style="cursor: default;"><span class="catTitle">${lang.allProducts ?? "All products"}</span></div>
+                    <div class="catList" style="max-height: none !important;">
+                        ${productsHtml}
+                    </div>  
+                </div>
+            `;
+        }
+    } else {
+        delete sortedProductsByBrand[brandId];
+        for (const category of categories) {
+            html = categoryHtml(brandId, category);
+            if (html != null) {
+                brandList.innerHTML += html;
+            }
         }
     }
     if (brandList.innerHTML == "") brandList.innerHTML = lang.nothingFound;
@@ -156,39 +204,55 @@ async function loadBrand(brand) {
 let previousExpandedId = null;
 
 /**
- * @param {string} catId 
+- 
+@param {string} catId 
  */
 function expandCategory(catId) {
+    if (catId.includes("all-products")) return;
     if (previousExpandedId != null) {
-        const prevCatList = document.getElementById(previousExpandedId).getElementsByClassName("catList")[0];
-        document.getElementById(previousExpandedId).getElementsByClassName("catArrow")[0].style.transform = null;
-        prevCatList.style.maxHeight = `${prevCatList.children[0].offsetHeight}px`;
+        const prevCatList = document.getElementById(previousExpandedId)?.getElementsByClassName("catList")[0];
+        const prevArrow = document.getElementById(previousExpandedId)?.getElementsByClassName("catArrow")[0];
+        if (prevArrow) prevArrow.style.transform = null;
+        if (prevCatList && prevCatList.children[0]) {
+            prevCatList.style.maxHeight = `${prevCatList.children[0].offsetHeight}px`;
+        }
     }
     if (previousExpandedId == catId) {
         previousExpandedId = null;
         return;
     }
-    const catList = document.getElementById(catId).getElementsByClassName("catList")[0];
-    catList.style.maxHeight = `${catList.scrollHeight}px`;
-    document.getElementById(catId).getElementsByClassName("catArrow")[0].style.transform = "rotate(225deg)";
+    const catElem = document.getElementById(catId);
+    if (!catElem) return;
+    const catList = catElem.getElementsByClassName("catList")[0];
+    if (catList) catList.style.maxHeight = `${catList.scrollHeight}px`;
+    const arrow = catElem.getElementsByClassName("catArrow")[0];
+    if (arrow) arrow.style.transform = "rotate(225deg)";
     previousExpandedId = catId;
 }
 
 function updateCategoryDimensions() {
     for (const catList of document.getElementsByClassName("catList")) {
-        const offsetHeight = catList.children[0].offsetHeight;
+        if (catList.closest('.cat')?.id?.includes("all-products")) {
+            catList.style.maxHeight = "none";
+            continue;
+        }
+        const offsetHeight = catList.children[0]?.offsetHeight ?? 0;
         catList.style.maxHeight = offsetHeight > 0 ? `${offsetHeight}px` : null;
     }
     if (previousExpandedId != null) {
-        const prevCatList = document.getElementById(previousExpandedId).getElementsByClassName("catList")[0];
-        prevCatList.style.maxHeight = `${prevCatList.scrollHeight + 5}px`;
+        const prevCat = document.getElementById(previousExpandedId);
+        if (prevCat && !prevCat.id.includes("all-products")) {
+            const prevCatList = prevCat.getElementsByClassName("catList")[0];
+            if (prevCatList) prevCatList.style.maxHeight = `${prevCatList.scrollHeight + 5}px`;
+        }
     }
 }
 addEventListener("resize", (e) => { updateCategoryDimensions(); })
 
 let selectedBrand = null;
 /**
- * @param {string} id 
+- 
+@param {string} id 
  */
 function selectBrand(id) {
     if (selectedBrand != null) {
@@ -230,7 +294,8 @@ function selectPreviousBrand() {
 }
 
 /**
- * @param {string} productId 
+- 
+@param {string} productId 
  */
 function zoomImage(productId) {
     const prod = products[productId];
@@ -263,7 +328,8 @@ function clearMessages(brandId) {
 }
 
 /**
- * @param {string} brandId 
+- 
+@param {string} brandId 
  */
 function openSettings(brandId) {
     const brand = getBrandById(brandId);
@@ -273,7 +339,8 @@ function openSettings(brandId) {
 }
 
 /**
- * @param {string} brandId 
+- 
+@param {string} brandId 
  */
 async function applyAndCloseSettings(brandId) {
     const brand = getBrandById(brandId);
@@ -338,7 +405,8 @@ function switchLanguage(langCode) {
 }
 
 /**
- * @param {string} productId 
+- 
+@param {string} productId 
  */
 function onErrorImage(productId) {
     document.getElementById(productId).getElementsByClassName("prodImageImage")[0].src = assets.placeholderProduct;
@@ -346,7 +414,8 @@ function onErrorImage(productId) {
 }
 
 /**
- * @param {string} unit 
+- 
+@param {string} unit 
  */
 function unitToSI(unit) {
     switch (unit) {
@@ -364,12 +433,17 @@ function unitToSI(unit) {
 }
 
 /**
- * 
- * @param {string} url 
- * @param {*} headers 
- * @param {string | null} brandId 
- * @param {string | null} errorMessage 
- * @returns {* | null}
+- 
+- 
+@param {string} url 
+- 
+@param {*} headers 
+- 
+@param {string | null} brandId 
+- 
+@param {string | null} errorMessage 
+- 
+@returns {* | null}
  */
 async function genericGet(url, headers, brandId, errorMessage) {
     try {
@@ -392,7 +466,8 @@ async function genericGet(url, headers, brandId, errorMessage) {
 
 let globalProductFilter = [];
 /**
- * @param {string} brandId 
+- 
+@param {string} brandId 
  */
 async function applyProductFilter(brandId) {
     globalProductFilter = document.getElementById(`${brandId}-filter`).value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];

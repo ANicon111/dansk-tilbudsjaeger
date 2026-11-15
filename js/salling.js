@@ -96,7 +96,7 @@ class Salling extends Brand {
                 `;
             },
             (settings) => {
-                this.settings.leafletBlacklist = document.getElementsByClassName("setting-leafletBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                settings.leafletBlacklist = document.getElementsByClassName("setting-leafletBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
                 return true;
             }
         );
@@ -112,10 +112,10 @@ class Salling extends Brand {
             },
             (settings) => {
                 const newList = document.getElementsByClassName("setting-enabledStoreList")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
-                if (JSON.stringify(this.settings.enabledStoreList) !== JSON.stringify(newList)) {
+                if (JSON.stringify(settings.enabledStoreList) !== JSON.stringify(newList)) {
                     this.forceNextReload = true;
                 }
-                this.settings.enabledStoreList = newList;
+                settings.enabledStoreList = newList;
                 return true;
             }
         );
@@ -132,8 +132,8 @@ class Salling extends Brand {
             (settings) => {
                 const val = parseInt(document.getElementsByClassName("setting-maxStoresPerEnabled")[0].value, 10);
                 if (!isNaN(val) && val > 0) {
-                    if (val != this.settings.maxStoresPerEnabled) this.forceNextReload = true;
-                    this.settings.maxStoresPerEnabled = val;
+                    if (val != settings.maxStoresPerEnabled) this.forceNextReload = true;
+                    settings.maxStoresPerEnabled = val;
                 } else {
                     setErr(document.getElementsByClassName("setting-maxStoresPerEnabled")[0]);
                     return false;
@@ -154,7 +154,7 @@ class Salling extends Brand {
                 `;
             },
             (settings) => {
-                this.settings.dataSaver = document.getElementsByClassName("setting-dataSaver")[0].checked ?? false;
+                settings.dataSaver = document.getElementsByClassName("setting-dataSaver")[0].checked ?? false;
                 return true;
             }
         );
@@ -202,11 +202,10 @@ class Salling extends Brand {
                     let left = points[0][0];
 
                     const runFrom = new Date(promotion.offer.run_from);
-                    runFrom.setHours(runFrom.getHours() + 12);
-                    runFrom.setHours(0);
                     const runTill = new Date(promotion.offer.run_till);
-                    runTill.setHours(runTill.getHours() + 12);
-                    runTill.setHours(0);
+                    // timezone adjustment
+                    runFrom.setHours(runFrom.getHours() + 12);
+                    runTill.setHours(runTill.getHours() - 12);
 
                     let prod = new Product();
                     prod.n = promotion.offer.heading;

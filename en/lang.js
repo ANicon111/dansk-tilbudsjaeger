@@ -1,5 +1,6 @@
 const lang = {
     currentLangCode: "en",
+    allProducts: "All products",
     selectLanguage: "Select Language",
     close: "Close",
     storeInstructionsTitle: "Store Information",
@@ -25,6 +26,10 @@ const lang = {
         enabled: {
             name: "Enable Store",
             description: "Toggles whether this store is active and loaded into the main deals feed."
+        },
+        groupProducts: {
+            name: "Group Products",
+            description: "Toggles product grouping into categories."
         },
         loyaltyCode: {
             name: "Loyalty Code",

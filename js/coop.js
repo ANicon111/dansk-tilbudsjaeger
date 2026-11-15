@@ -15,7 +15,7 @@ class Coop extends Brand {
         this.accentColor = accentColor;
         this.settingConfigs.loyaltyCode = new SettingConfig(
             this.settingConfigs.loyaltyCode.html,
-            (settings) => {
+            (_settings) => {
                 const code = document.getElementsByClassName("setting-loyaltyCode")[0].value.trim();
                 if (code != this.settings.loyaltyCode) {
                     const b = getBrandById("brand-Brugsen");
@@ -46,7 +46,7 @@ class Coop extends Brand {
                 `;
             },
             (settings) => {
-                this.settings.leafletBlacklist = document.getElementsByClassName("setting-leafletBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                settings.leafletBlacklist = document.getElementsByClassName("setting-leafletBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
                 return true;
             }
         );
@@ -63,12 +63,11 @@ class Coop extends Brand {
                 `;
             },
             (settings) => {
-                this.settings.dataSaver = document.getElementsByClassName("setting-dataSaver")[0].checked ?? false;
+                settings.dataSaver = document.getElementsByClassName("setting-dataSaver")[0].checked ?? false;
                 return true;
             }
         );
 
-        this.settings.updatePeriodMinutes = 30; //This should account for local prices that may change often
         this.stored.stores = [];
         this.stored.storesLastUpdate = null;
     }
@@ -78,11 +77,9 @@ class Coop extends Brand {
             const rawData = await genericGet('https://raw.githubusercontent.com/ANicon111/coop-json/data/data.json', {}, this.id(), lang.errors.failedLeaflet(this.name));
             const chainsOrder = rawData?.chains ?? [];
             const leafletsOrder = rawData?.catalogs ?? [];
-            // 1. Find the target chain by matching the coop store name
             const matchingChain = chainsOrder.find(chain => chain.name.toLowerCase().includes(this.apiName));
             const targetChainId = matchingChain ? matchingChain.id : null;
 
-            // 2. Filter leaflets where chainId matches and extract their unique id
             const filteredLeaflets = targetChainId
                 ? leafletsOrder
                     .filter(leaflet => leaflet.chainId === targetChainId)
@@ -116,11 +113,10 @@ class Coop extends Brand {
                     let left = points[0][0];
 
                     const runFrom = new Date(promotion.offer.run_from);
-                    runFrom.setHours(runFrom.getHours() + 12);
-                    runFrom.setHours(0);
                     const runTill = new Date(promotion.offer.run_till);
-                    runTill.setHours(runTill.getHours() + 12);
-                    runTill.setHours(0);
+                    // timezone adjustment
+                    runFrom.setHours(runFrom.getHours() + 12);
+                    runTill.setHours(runTill.getHours() - 12);
 
                     let prod = new Product();
                     prod.n = promotion.offer.heading;

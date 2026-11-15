@@ -1,5 +1,6 @@
 const lang = {
     currentLangCode: "da",
+    allProducts: "Alle produkter",
     selectLanguage: "Vælg sprog",
     close: "Luk",
     storeInstructionsTitle: "Butiksinformation",
@@ -25,6 +26,10 @@ const lang = {
         enabled: {
             name: "Aktiver butik",
             description: "Tænder eller slukker for, om denne butik er aktiv og indlæses i det samlede tilbudsfeed."
+        },
+        groupProducts: {
+            name: "Grupper produkter",
+            description: "Slår produktgruppering i kategorier til/fra."
         },
         loyaltyCode: {
             name: "Lokalitets-/Medlemskode",

@@ -1,5 +1,6 @@
 const lang = {
     currentLangCode: "de",
+    allProducts: "Alle Produkte",
     selectLanguage: "Sprache auswählen",
     close: "Schließen",
     storeInstructionsTitle: "Geschäftsinformationen",
@@ -25,6 +26,10 @@ const lang = {
         enabled: {
             name: "Geschäft aktivieren",
             description: "Schaltet um, ob dieses Geschäft aktiv ist und in den Hauptangebots-Feed geladen wird."
+        },
+        groupProducts: {
+            name: "Produkte gruppieren",
+            description: "Schaltet die Produktgruppierung in Kategorien um."
         },
         loyaltyCode: {
             name: "Treuecode / Mitgliedsnummer",

@@ -13,7 +13,7 @@ class SettingConfig {
      * @returns {string}
      * @abstract
      */
-    html(settings) {
+    html(_settings) {
         return null;
     }
 
@@ -22,7 +22,7 @@ class SettingConfig {
      * @returns {bool} true if succeded
      * @abstract
      */
-    parseAndStore(settings) {
+    parseAndStore(_settings) {
         return false;
     }
 }
@@ -67,6 +67,7 @@ class Brand {
     //these are stored in localStorage
     settings = {
         enabled: true,
+        groupProducts: false, //TODO will be false by default for as long as it takes me to group products properly
         loyaltyCode: null,
         updatePeriodMinutes: 120, //Should be a sane default for leaflet-only stores
         ignoreThreshold: 200,
@@ -88,6 +89,22 @@ class Brand {
             },
             (settings) => {
                 settings.enabled = document.getElementsByClassName("setting-enabled")[0].checked;
+                return true;
+            }
+        ),
+        groupProducts: new SettingConfig(
+            (settings) => {
+                return `
+                    <div class="settingRow checkboxRow">
+                        <label class="settingLabelCheckbox">
+                            <input class="setting-groupProducts" type="checkbox" ${settings.groupProducts ? 'checked' : ''}>
+                            <span>${lang.settings.groupProducts.name}</span>
+                        </label>
+                    </div>
+                `;
+            },
+            (settings) => {
+                settings.groupProducts = document.getElementsByClassName("setting-groupProducts")[0].checked;
                 return true;
             }
         ),
@@ -118,7 +135,7 @@ class Brand {
             (settings) => {
                 const val = parseInt(document.getElementsByClassName("setting-updatePeriodMinutes")[0].value, 10);
                 if (!isNaN(val) && val > 0) {
-                    this.settings.updatePeriodMinutes = val;
+                    settings.updatePeriodMinutes = val;
                 } else {
                     return false;
                 }
@@ -137,7 +154,7 @@ class Brand {
             (settings) => {
                 const val = parseInt(document.getElementsByClassName("setting-ignoreThreshold")[0].value, 10);
                 if (!isNaN(val) && val >= 0) {
-                    this.settings.ignoreThreshold = val;
+                    settings.ignoreThreshold = val;
                 } else {
                     return false;
                 }

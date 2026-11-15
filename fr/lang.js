@@ -1,5 +1,6 @@
 const lang = {
     currentLangCode: "fr",
+    allProducts: "Tous les produits",
     selectLanguage: "Choisir la langue",
     close: "Fermer",
     storeInstructionsTitle: "Informations sur le magasin",
@@ -25,6 +26,10 @@ const lang = {
         enabled: {
             name: "Activer le magasin",
             description: "Active ou désactive la présence de ce magasin dans le flux principal des offres."
+        },
+        groupProducts: {
+            name: "Grouper les produits",
+            description: "Active/désactive le regroupement des produits par catégories."
         },
         loyaltyCode: {
             name: "Code de fidélité",

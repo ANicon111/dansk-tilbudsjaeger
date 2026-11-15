@@ -8,10 +8,8 @@
 function parseLidlDate(dateString) {
     if (!dateString || typeof dateString !== 'string') return null;
 
-    // Clean up input: trim and normalize whitespace/dashes
     const cleaned = dateString.trim().replace(/[\u2013\u2014]/g, '-');
 
-    // Match pattern: optional "fra", followed by DD.MM., optionally followed by - DD.MM.
     const regex = /^(?:fra\s+)?(\d{1,2})\.(\d{1,2})\.(?:\s*-\s*(\d{1,2})\.(\d{1,2})\.)?$/i;
     const match = cleaned.match(regex);
 
@@ -20,20 +18,23 @@ function parseLidlDate(dateString) {
     const [, startDay, startMonth, endDay, endMonth] = match;
     const currentYear = new Date().getFullYear();
 
-    // JavaScript months are zero-indexed (0 = Jan, 11 = Dec)
     const start = new Date(currentYear, parseInt(startMonth, 10) - 1, parseInt(startDay, 10));
     let end = null;
 
     if (endDay && endMonth) {
         let yearForEnd = currentYear;
 
-        // Handle year boundary edge case (e.g., offer starts in Dec and ends in Jan)
         if (parseInt(startMonth, 10) === 12 && parseInt(endMonth, 10) === 1) {
             yearForEnd += 1;
         }
 
         end = new Date(yearForEnd, parseInt(endMonth, 10) - 1, parseInt(endDay, 10));
     }
+
+    // timezone adjustment
+    start.setHours(start.getHours() + 12);
+    end?.setHours(end.getHours() + 12);
+
 
     return { start, end };
 }
@@ -55,7 +56,7 @@ class Lidl extends Brand {
                 `;
             },
             (settings) => {
-                this.settings.promotionCategoryBlacklist = document.getElementsByClassName("setting-promotionCategoryBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
+                settings.promotionCategoryBlacklist = document.getElementsByClassName("setting-promotionCategoryBlacklist")[0].value?.split(',').map(item => item.trim()).filter(item => item.length > 0) ?? [];
                 return true;
             }
         );

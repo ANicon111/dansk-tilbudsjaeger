@@ -19,12 +19,10 @@ class Rema extends Brand {
                 prod.b = this.id();
                 prod.c = item.department?.name ?? "";
 
-                // Image handling
                 const img = item.images?.[0]?.large || item.images?.[0]?.medium || item.images?.[0]?.small;
                 prod.i = img;
                 prod.zi = img;
 
-                // Price and Date extraction
                 const offerPrice = item.prices?.find(p => p.is_advertised || p.is_campaign) ?? item.prices?.[0];
                 const regularPrice = item.prices?.find(p => !p.is_campaign && !p.is_advertised);
 
@@ -39,14 +37,12 @@ class Rema extends Brand {
                     }
                 }
 
-                // Extract unit size and unit from the first price object
                 const firstPrice = item.prices?.[0];
                 if (firstPrice) {
                     if (firstPrice.consumption_quantity != null && firstPrice.consumption_unit) {
                         prod.ls = parseFloat(firstPrice.consumption_quantity);
                         prod.u = firstPrice.consumption_unit;
                     } else if (firstPrice.price && firstPrice.compare_unit_price && firstPrice.compare_unit) {
-                        // Derives total size (e.g., 20 / 55.56 = 0.36 kg)
                         const calculatedSize = firstPrice.price / firstPrice.compare_unit_price;
                         prod.ls = parseFloat(calculatedSize.toFixed(3));
                         prod.u = firstPrice.compare_unit;

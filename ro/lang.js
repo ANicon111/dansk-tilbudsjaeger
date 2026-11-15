@@ -1,5 +1,6 @@
 const lang = {
     currentLangCode: "ro",
+    allProducts: "Toate produsele",
     selectLanguage: "Selectează limba",
     close: "Închide",
     storeInstructionsTitle: "Informații magazin",
