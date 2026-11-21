@@ -69,7 +69,7 @@ function productHtml(id, category = null) {
 function categoryHtml(brandId, category) {
     let idList = productIdsByBrandAndCategory[brandId]?.[category];
     if (globalProductFilter != null && globalProductFilter.length > 0) idList = idList?.filter(id => globalProductFilter.some(keyword => productSearchString(products[id] ?? "").includes(keyword.toLowerCase())));
-    idList?.sort((a, b) => (products[b]?.v ?? 0) - (products[a]?.v ?? 0));
+    idList.sort((a, b) => (products[b].v) - (products[a].v));
     if (idList != null && idList.length > 0) {
         let productsHtml = "";
         for (const pid of idList) {
@@ -164,7 +164,6 @@ async function loadBrand(brand) {
                 if (globalProductFilter != null && globalProductFilter.length > 0) {
                     filteredList = filteredList.filter(id => globalProductFilter.some(keyword => productSearchString(products[id] ?? "").includes(keyword.toLowerCase())));
                 }
-                filteredList.sort((a, b) => (products[b]?.v ?? 0) - (products[a]?.v ?? 0));
                 for (const id of filteredList) {
                     if (products[id] != null) {
                         allProductsList.push({ id, category });
@@ -172,6 +171,7 @@ async function loadBrand(brand) {
                 }
             }
         }
+        allProductsList.sort((a, b) => (products[b.id].v) - (products[a.id].v));
         sortedProductsByBrand[brandId] = allProductsList;
 
         if (allProductsList.length > 0) {
