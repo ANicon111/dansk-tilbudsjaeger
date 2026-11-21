@@ -472,9 +472,11 @@ function productSetUnit(prod) {
         case "dl":
         case "hg":
             pricePerUnitAdjustment = 10;
+            break;
         case "cl":
         case "dag":
             pricePerUnitAdjustment = 100;
+            break;
         case "ml":
         case "g":
             pricePerUnitAdjustment = 1000;
